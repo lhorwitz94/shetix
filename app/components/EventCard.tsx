@@ -16,10 +16,10 @@ const MARKET_STYLES: Record<Market, string> = {
 }
 
 const MARKET_SHORT: Record<Market, string> = {
-  Ticketmaster: 'TM',
-  SeatGeek: 'SG',
-  StubHub: 'SH',
-  'Vivid Seats': 'VS',
+  Ticketmaster: 'Ticketmaster',
+  SeatGeek: 'SeatGeek',
+  StubHub: 'StubHub',
+  'Vivid Seats': 'Vivid Seats',
 }
 
 function formatDate(dateStr: string) {
@@ -67,7 +67,7 @@ export default function EventCard({ event }: { event: Event }) {
               <p className="text-lg font-bold text-gray-900">${lowestPrice}</p>
             </>
           ) : (
-            <p className="text-sm font-medium text-gray-500">See prices</p>
+            <p className="text-sm font-bold text-gray-500">See tickets</p>
           )}
         </div>
         <div className="flex items-center gap-1.5 flex-wrap justify-end">
@@ -78,7 +78,7 @@ export default function EventCard({ event }: { event: Event }) {
               target="_blank"
               rel="noopener noreferrer"
               title={m.minPrice > 0 ? `${m.market} — from $${m.minPrice}` : m.market}
-              className={`text-white text-[10px] font-bold px-2 py-1 rounded-md ${MARKET_STYLES[m.market]} hover:opacity-80 transition-opacity`}
+              className={`text-white text-[10px] font-bold px-2.5 py-1 rounded-md ${MARKET_STYLES[m.market]} hover:opacity-80 transition-opacity`}
             >
               {MARKET_SHORT[m.market]}
             </a>
