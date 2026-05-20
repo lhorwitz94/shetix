@@ -13,19 +13,8 @@ export default function Home() {
             <span className="text-violet-600">all in one place</span>
           </h1>
           <p className="text-lg text-gray-500 max-w-xl mx-auto">
-            Live listings from Ticketmaster across WNBA, NWSL, tennis, golf, and college sports.
+            Live listings from across WNBA, NWSL, tennis, golf, hockey, and college sports.
           </p>
-          <div className="flex items-center justify-center gap-12 mt-8 flex-wrap">
-            {[
-              { label: 'Ticket Market', value: 'Ticketmaster' },
-              { label: 'Sports', value: '5' },
-            ].map((stat) => (
-              <div key={stat.label} className="text-center">
-                <p className="text-3xl font-bold text-violet-600">{stat.value}</p>
-                <p className="text-sm text-gray-500 mt-0.5">{stat.label}</p>
-              </div>
-            ))}
-          </div>
         </div>
       </div>
 
