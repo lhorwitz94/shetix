@@ -6,7 +6,7 @@ import Header from './components/Header'
 const geist = Geist({ subsets: ['latin'], variable: '--font-geist' })
 
 export const metadata: Metadata = {
-  title: 'shetix — Women\'s Sports Tickets',
+  title: 'wtix — Women\'s Sports Tickets',
   description: 'Find tickets to WNBA, NWSL, tennis, golf, and college women\'s sports events from multiple ticket markets in one place.',
 }
 

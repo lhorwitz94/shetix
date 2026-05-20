@@ -47,7 +47,7 @@ export default function EventCard({ event }: { event: Event }) {
 
         <h3 className="font-bold text-gray-900 text-base leading-snug mb-1">{event.title}</h3>
         {event.subtitle && (
-          <p className="text-xs text-violet-600 font-medium mb-2">{event.subtitle}</p>
+          <p className="text-xs text-[#9966CB] font-medium mb-2">{event.subtitle}</p>
         )}
 
         <p className="text-sm text-gray-500 flex items-center gap-1">

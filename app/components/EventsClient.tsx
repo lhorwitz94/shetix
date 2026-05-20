@@ -66,13 +66,13 @@ export default function EventsClient({ events }: { events: Event[] }) {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search teams, venues, or cities…"
-            className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-gray-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-violet-400 focus:border-transparent transition"
+            className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-gray-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#9966CB] focus:border-transparent transition"
           />
         </div>
         <select
           value={sort}
           onChange={(e) => setSort(e.target.value as SortOption)}
-          className="sm:w-52 px-3 py-2.5 rounded-xl border border-gray-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-violet-400 cursor-pointer"
+          className="sm:w-52 px-3 py-2.5 rounded-xl border border-gray-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#9966CB] cursor-pointer"
         >
           {SORT_OPTIONS.map((o) => (
             <option key={o}>{o}</option>
@@ -89,8 +89,8 @@ export default function EventsClient({ events }: { events: Event[] }) {
               onClick={() => setActiveSport(sport)}
               className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all ${
                 activeSport === sport
-                  ? 'bg-violet-600 text-white shadow-sm'
-                  : 'bg-white border border-gray-200 text-gray-600 hover:border-violet-300 hover:text-violet-600'
+                  ? 'bg-[#9966CB] text-white shadow-sm'
+                  : 'bg-white border border-gray-200 text-gray-600 hover:border-[#c4a0e0] hover:text-[#9966CB]'
               }`}
             >
               {sport}
