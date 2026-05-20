@@ -28,7 +28,8 @@ function formatDate(dateStr: string) {
 }
 
 export default function EventCard({ event }: { event: Event }) {
-  const lowestPrice = Math.min(...event.markets.map((m) => m.minPrice))
+  const priceValues = event.markets.map((m) => m.minPrice).filter((p) => p > 0)
+  const lowestPrice = priceValues.length > 0 ? Math.min(...priceValues) : null
   const badgeStyle = SPORT_STYLES[event.sport] ?? 'bg-gray-100 text-gray-600'
 
   return (
@@ -60,15 +61,23 @@ export default function EventCard({ event }: { event: Event }) {
 
       <div className="border-t border-gray-100 px-5 py-3 flex items-center justify-between gap-3 bg-gray-50">
         <div>
-          <p className="text-xs text-gray-400 leading-none mb-0.5">From</p>
-          <p className="text-lg font-bold text-gray-900">${lowestPrice}</p>
+          {lowestPrice !== null ? (
+            <>
+              <p className="text-xs text-gray-400 leading-none mb-0.5">From</p>
+              <p className="text-lg font-bold text-gray-900">${lowestPrice}</p>
+            </>
+          ) : (
+            <p className="text-sm font-medium text-gray-500">See prices</p>
+          )}
         </div>
         <div className="flex items-center gap-1.5 flex-wrap justify-end">
           {event.markets.map((m) => (
             <a
               key={m.market}
               href={m.url}
-              title={`${m.market} — from $${m.minPrice}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              title={m.minPrice > 0 ? `${m.market} — from $${m.minPrice}` : m.market}
               className={`text-white text-[10px] font-bold px-2 py-1 rounded-md ${MARKET_STYLES[m.market]} hover:opacity-80 transition-opacity`}
             >
               {MARKET_SHORT[m.market]}

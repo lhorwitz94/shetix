@@ -1,5 +1,6 @@
-import { events } from '@/lib/data'
-import EventsClient from './components/EventsClient'
+import { Suspense } from 'react'
+import EventsFetcher from './components/EventsFetcher'
+import EventsSkeleton from './components/EventsSkeleton'
 
 export default function Home() {
   return (
@@ -12,14 +13,12 @@ export default function Home() {
             <span className="text-violet-600">all in one place</span>
           </h1>
           <p className="text-lg text-gray-500 max-w-xl mx-auto">
-            Compare listings from Ticketmaster, SeatGeek, StubHub, and Vivid Seats across
-            WNBA, NWSL, tennis, golf, and college sports.
+            Live listings from Ticketmaster across WNBA, NWSL, tennis, golf, and college sports.
           </p>
-          <div className="flex items-center justify-center gap-8 mt-8 flex-wrap">
+          <div className="flex items-center justify-center gap-12 mt-8 flex-wrap">
             {[
-              { label: 'Markets', value: '4+' },
+              { label: 'Ticket Market', value: 'Ticketmaster' },
               { label: 'Sports', value: '5' },
-              { label: 'Upcoming Events', value: String(events.length) },
             ].map((stat) => (
               <div key={stat.label} className="text-center">
                 <p className="text-3xl font-bold text-violet-600">{stat.value}</p>
@@ -30,7 +29,9 @@ export default function Home() {
         </div>
       </div>
 
-      <EventsClient events={events} />
+      <Suspense fallback={<EventsSkeleton />}>
+        <EventsFetcher />
+      </Suspense>
     </main>
   )
 }

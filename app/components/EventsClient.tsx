@@ -31,20 +31,17 @@ export default function EventsClient({ events }: { events: Event[] }) {
       )
     }
 
+    const minPrice = (e: Event) => {
+      const prices = e.markets.map((m) => m.minPrice).filter((p) => p > 0)
+      return prices.length > 0 ? Math.min(...prices) : Infinity
+    }
+
     if (sort === 'Date') {
       out = [...out].sort((a, b) => a.date.localeCompare(b.date))
     } else if (sort === 'Price: Low to High') {
-      out = [...out].sort(
-        (a, b) =>
-          Math.min(...a.markets.map((m) => m.minPrice)) -
-          Math.min(...b.markets.map((m) => m.minPrice)),
-      )
+      out = [...out].sort((a, b) => minPrice(a) - minPrice(b))
     } else {
-      out = [...out].sort(
-        (a, b) =>
-          Math.min(...b.markets.map((m) => m.minPrice)) -
-          Math.min(...a.markets.map((m) => m.minPrice)),
-      )
+      out = [...out].sort((a, b) => minPrice(b) - minPrice(a))
     }
 
     return out
