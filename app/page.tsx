@@ -16,8 +16,7 @@ export default function Home() {
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
           <h1 className="text-4xl sm:text-5xl font-bold tracking-tight mb-4" style={{ color: '#ffffff' }}>
-            Women&apos;s sports tickets,{' '}
-            <span style={{ color: '#cc88ff' }}>all in one place</span>
+            The home for women&apos;s sports tickets.
           </h1>
           <p className="text-lg max-w-xl mx-auto" style={{ color: 'rgba(255,255,255,0.6)' }}>
             Live listings from across WNBA, NWSL, tennis, golf, hockey, and college sports.
