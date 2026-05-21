@@ -1,26 +1,19 @@
 import type { Event, Market } from '@/lib/types'
 
 const SPORT_STYLES: Record<string, string> = {
-  WNBA: 'bg-orange-100 text-orange-700',
-  NWSL: 'bg-emerald-100 text-emerald-700',
-  PWHL: 'bg-cyan-100 text-cyan-700',
-  Tennis: 'bg-lime-100 text-lime-700',
-  Golf: 'bg-green-100 text-green-700',
+  WNBA:    'bg-orange-100 text-orange-700',
+  NWSL:    'bg-emerald-100 text-emerald-700',
+  PWHL:    'bg-cyan-100 text-cyan-700',
+  Tennis:  'bg-lime-100 text-lime-700',
+  Golf:    'bg-green-100 text-green-700',
   College: 'bg-blue-100 text-blue-700',
 }
 
-const MARKET_STYLES: Record<Market, string> = {
-  Ticketmaster: 'bg-blue-600',
-  SeatGeek: 'bg-orange-500',
-  StubHub: 'bg-rose-600',
-  'Vivid Seats': 'bg-purple-600',
-}
-
-const MARKET_SHORT: Record<Market, string> = {
-  Ticketmaster: 'Ticketmaster',
-  SeatGeek: 'SeatGeek',
-  StubHub: 'StubHub',
-  'Vivid Seats': 'Vivid Seats',
+const MARKET_TEXT: Record<Market, string> = {
+  Ticketmaster: 'text-blue-700',
+  SeatGeek:     'text-orange-600',
+  StubHub:      'text-rose-600',
+  'Vivid Seats':'text-purple-700',
 }
 
 function formatDate(dateStr: string) {
@@ -31,6 +24,7 @@ function formatDate(dateStr: string) {
 export default function EventCard({ event }: { event: Event }) {
   const priceValues = event.markets.map((m) => m.minPrice).filter((p) => p > 0)
   const lowestPrice = priceValues.length > 0 ? Math.min(...priceValues) : null
+  const hasComparablePrices = priceValues.length >= 2
   const badgeStyle = SPORT_STYLES[event.sport] ?? 'bg-gray-100 text-gray-600'
 
   return (
@@ -60,31 +54,39 @@ export default function EventCard({ event }: { event: Event }) {
         </p>
       </div>
 
-      <div className="border-t border-gray-100 px-5 py-3 flex items-center justify-between gap-3 bg-gray-50">
-        <div>
-          {lowestPrice !== null ? (
-            <>
-              <p className="text-xs text-gray-400 leading-none mb-0.5">From</p>
-              <p className="text-lg font-bold text-gray-900">${lowestPrice}</p>
-            </>
-          ) : (
-            <p className="text-sm font-bold text-gray-500">See tickets</p>
-          )}
-        </div>
-        <div className="flex items-center gap-1.5 flex-wrap justify-end">
-          {event.markets.map((m) => (
+      {/* Per-market price rows */}
+      <div className="border-t border-gray-100 px-4 py-3 bg-gray-50 flex flex-col gap-1.5">
+        {event.markets.map((m) => {
+          const hasPrice = m.minPrice > 0
+          const isBest = hasComparablePrices && hasPrice && m.minPrice === lowestPrice
+          return (
             <a
               key={m.market}
               href={m.url}
               target="_blank"
               rel="noopener noreferrer"
-              title={m.minPrice > 0 ? `${m.market} — from $${m.minPrice}` : m.market}
-              className={`text-white text-[10px] font-bold px-2.5 py-1 rounded-md ${MARKET_STYLES[m.market]} hover:opacity-80 transition-opacity`}
+              className={`flex items-center justify-between gap-3 px-3 py-2 rounded-xl border text-sm transition-opacity hover:opacity-75 ${
+                isBest
+                  ? 'bg-emerald-50 border-emerald-200'
+                  : 'bg-white border-gray-100'
+              }`}
             >
-              {MARKET_SHORT[m.market]}
+              <span className={`text-xs font-bold ${MARKET_TEXT[m.market]}`}>
+                {m.market}
+              </span>
+              <div className="flex items-center gap-2">
+                {isBest && (
+                  <span className="text-[10px] font-bold text-emerald-600 uppercase tracking-wide">
+                    Best price
+                  </span>
+                )}
+                <span className={`text-sm font-bold ${isBest ? 'text-emerald-700' : 'text-gray-700'}`}>
+                  {hasPrice ? `$${m.minPrice}` : 'See tickets'}
+                </span>
+              </div>
             </a>
-          ))}
-        </div>
+          )
+        })}
       </div>
     </div>
   )
