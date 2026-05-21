@@ -1,4 +1,4 @@
-export type Sport = 'WNBA' | 'NWSL' | 'Tennis' | 'Golf' | 'College'
+export type Sport = 'WNBA' | 'NWSL' | 'PWHL' | 'Tennis' | 'Golf' | 'College'
 
 export type Market = 'Ticketmaster' | 'SeatGeek' | 'StubHub' | 'Vivid Seats'
 

@@ -333,4 +333,4 @@ export const events: Event[] = [
   },
 ]
 
-export const SPORTS = ['WNBA', 'NWSL', 'Tennis', 'Golf', 'College'] as const
+export const SPORTS = ['WNBA', 'NWSL', 'PWHL', 'Tennis', 'Golf', 'College'] as const

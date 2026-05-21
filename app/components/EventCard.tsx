@@ -3,6 +3,7 @@ import type { Event, Market } from '@/lib/types'
 const SPORT_STYLES: Record<string, string> = {
   WNBA: 'bg-orange-100 text-orange-700',
   NWSL: 'bg-emerald-100 text-emerald-700',
+  PWHL: 'bg-cyan-100 text-cyan-700',
   Tennis: 'bg-lime-100 text-lime-700',
   Golf: 'bg-green-100 text-green-700',
   College: 'bg-blue-100 text-blue-700',

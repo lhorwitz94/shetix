@@ -29,6 +29,7 @@ interface SGResponse {
 const QUERIES: { sport: Sport; keyword: string }[] = [
   { sport: 'WNBA',    keyword: 'WNBA'        },
   { sport: 'NWSL',    keyword: 'NWSL'        },
+  { sport: 'PWHL',    keyword: 'PWHL'        },
   { sport: 'Golf',    keyword: 'LPGA'        },
   { sport: 'College', keyword: 'NCAA Women'  },
 ]

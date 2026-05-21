@@ -41,6 +41,7 @@ interface Query {
 const QUERIES: Query[] = [
   { sport: 'WNBA',    keyword: 'WNBA',                                    countryCode: 'US' },
   { sport: 'NWSL',    keyword: 'NWSL',                                    countryCode: 'US' },
+  { sport: 'PWHL',    keyword: 'PWHL'                                                       },
   { sport: 'Tennis',  keyword: 'WTA'                                                        },
   { sport: 'Golf',    keyword: 'Women', classificationName: 'Golf'                          },
   { sport: 'College', keyword: 'NCAA Women',                               countryCode: 'US' },
