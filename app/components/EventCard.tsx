@@ -1,4 +1,5 @@
 import type { Event, Market } from '@/lib/types'
+import { isWithin72Hours } from '@/lib/utils'
 
 const SPORT_STYLES: Record<string, string> = {
   WNBA:    'bg-orange-100 text-orange-700',
@@ -21,20 +22,6 @@ function formatDate(dateStr: string) {
   return d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })
 }
 
-function parseEventStart(date: string, time: string): Date {
-  const base = new Date(date + 'T00:00:00')
-  const match = time.match(/^(\d+):(\d+)\s*(AM|PM)$/i)
-  if (!match) return base
-  let h = parseInt(match[1])
-  const m = parseInt(match[2])
-  const period = match[3].toUpperCase()
-  if (period === 'PM' && h !== 12) h += 12
-  if (period === 'AM' && h === 12) h = 0
-  base.setHours(h, m, 0, 0)
-  return base
-}
-
-const MS_72H = 72 * 60 * 60 * 1000
 
 export default function EventCard({ event }: { event: Event }) {
   const priceValues = event.markets.map((m) => m.minPrice).filter((p) => p > 0)
@@ -42,10 +29,7 @@ export default function EventCard({ event }: { event: Event }) {
   const hasComparablePrices = priceValues.length >= 2
   const badgeStyle = SPORT_STYLES[event.sport] ?? 'bg-gray-100 text-gray-600'
 
-  const now = Date.now()
-  const eventStart = parseEventStart(event.date, event.time).getTime()
-  const msUntil = eventStart - now
-  const isSoon = msUntil > 0 && msUntil <= MS_72H
+  const isSoon = isWithin72Hours(event.date, event.time)
 
   return (
     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow flex flex-col overflow-hidden">

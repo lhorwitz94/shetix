@@ -3,20 +3,23 @@
 import { useState, useMemo } from 'react'
 import type { Event, Sport } from '@/lib/types'
 import { SPORTS } from '@/lib/data'
+import { isWithin72Hours } from '@/lib/utils'
 import EventCard from './EventCard'
 
 const SORT_OPTIONS = ['Date', 'Price: Low to High', 'Price: High to Low'] as const
 type SortOption = (typeof SORT_OPTIONS)[number]
 
 export default function EventsClient({ events }: { events: Event[] }) {
-  const [activeSport, setActiveSport] = useState<Sport | 'All'>('All')
+  const [activeSport, setActiveSport] = useState<Sport | 'All' | 'Upcoming'>('All')
   const [search, setSearch] = useState('')
   const [sort, setSort] = useState<SortOption>('Date')
 
   const filtered = useMemo(() => {
     let out = events
 
-    if (activeSport !== 'All') {
+    if (activeSport === 'Upcoming') {
+      out = out.filter((e) => isWithin72Hours(e.date, e.time))
+    } else if (activeSport !== 'All') {
       out = out.filter((e) => e.sport === activeSport)
     }
 
@@ -83,7 +86,7 @@ export default function EventsClient({ events }: { events: Event[] }) {
       {/* Sport filter pills */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-6">
         <div className="flex items-center gap-2 flex-wrap">
-          {(['All', ...SPORTS] as const).map((sport) => (
+          {(['All', 'Upcoming', ...SPORTS] as const).map((sport) => (
             <button
               key={sport}
               onClick={() => setActiveSport(sport)}
@@ -93,7 +96,7 @@ export default function EventsClient({ events }: { events: Event[] }) {
                   : 'bg-white border border-gray-200 text-gray-600 hover:border-[#c4a0e0] hover:text-[#9966CB]'
               }`}
             >
-              {sport}
+              {sport === 'Upcoming' ? '🗓️ Upcoming' : sport}
             </button>
           ))}
           <span className="ml-auto text-sm text-gray-400">
