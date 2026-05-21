@@ -10,9 +10,11 @@ body {
   color: var(--foreground);
 }
 
-@keyframes shimmer {
+/* Plays once: sweeps across then settles at centered gradient position */
+@keyframes shimmer-once {
   0%   { background-position: 200% center; }
-  100% { background-position: -200% center; }
+  70%  { background-position: 0% center; }
+  100% { background-position: 0% center; }
 }
 
 @keyframes glow-pulse {

@@ -40,7 +40,7 @@ export default function Header() {
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
               backgroundClip: 'text',
-              animation: 'shimmer 5s linear infinite',
+              animation: 'shimmer-once 1.6s cubic-bezier(0.2, 0.8, 0.3, 1) 0.2s both',
             }}
           >
             wtix
