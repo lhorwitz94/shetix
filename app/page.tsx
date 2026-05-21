@@ -1,12 +1,13 @@
 import { Suspense } from 'react'
 import EventsFetcher from './components/EventsFetcher'
 import EventsSkeleton from './components/EventsSkeleton'
+import WBorder from './components/WBorder'
 
 export default function Home() {
   return (
     <main className="flex-1">
       {/* Hero */}
-      <div className="bg-white border-b border-gray-100">
+      <div className="bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 text-center">
           <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 tracking-tight mb-3">
             Women&apos;s sports tickets,{' '}
@@ -17,6 +18,8 @@ export default function Home() {
           </p>
         </div>
       </div>
+
+      <WBorder />
 
       <Suspense fallback={<EventsSkeleton />}>
         <EventsFetcher />
