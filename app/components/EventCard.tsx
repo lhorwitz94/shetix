@@ -1,5 +1,5 @@
 import type { Event, Market } from '@/lib/types'
-import { isWithin72Hours } from '@/lib/utils'
+import { isWithin72Hours, parseEventStart } from '@/lib/utils'
 
 const SPORT_STYLES: Record<string, string> = {
   WNBA:    'bg-orange-100 text-orange-700',
@@ -30,6 +30,7 @@ export default function EventCard({ event }: { event: Event }) {
   const badgeStyle = SPORT_STYLES[event.sport] ?? 'bg-gray-100 text-gray-600'
 
   const isSoon = isWithin72Hours(event.date, event.time)
+  const isPast = Date.now() > parseEventStart(event.date, event.time).getTime()
 
   return (
     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow flex flex-col overflow-hidden">
@@ -40,7 +41,8 @@ export default function EventCard({ event }: { event: Event }) {
           </span>
           <div className="text-right">
             <p className="text-xs font-medium text-gray-500">
-              {isSoon && <span title="Starting within 72 hours">🗓️ </span>}
+              {isPast  && <span title="Event may be in progress or recently started">🔴 </span>}
+              {!isPast && isSoon && <span title="Starting within 72 hours">🗓️ </span>}
               {formatDate(event.date)}
             </p>
             <p className="text-xs text-gray-400">{event.time}</p>
