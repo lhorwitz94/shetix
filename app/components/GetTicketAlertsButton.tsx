@@ -30,26 +30,44 @@ export default function GetTicketAlertsButton() {
 
   return (
     <>
-      {/* Trigger button */}
+      {/* Trigger button — matches the wtix logo treatment */}
       <button
         onClick={() => setOpen(true)}
         style={{
-          background: '#9966CB',
-          color: '#fff',
-          fontWeight: 700,
-          fontSize: '0.8rem',
-          padding: '0.45rem 1rem',
+          background: 'rgba(255,255,255,0.07)',
+          border: '1px solid rgba(153,102,203,0.55)',
           borderRadius: '999px',
-          border: 'none',
+          padding: '0.45rem 1.1rem',
           cursor: 'pointer',
-          letterSpacing: '0.01em',
           whiteSpace: 'nowrap',
-          transition: 'opacity 0.15s',
+          transition: 'border-color 0.15s, background 0.15s',
         }}
-        onMouseEnter={e => (e.currentTarget.style.opacity = '0.85')}
-        onMouseLeave={e => (e.currentTarget.style.opacity = '1')}
+        onMouseEnter={e => {
+          e.currentTarget.style.background = 'rgba(153,102,203,0.18)'
+          e.currentTarget.style.borderColor = 'rgba(153,102,203,0.9)'
+        }}
+        onMouseLeave={e => {
+          e.currentTarget.style.background = 'rgba(255,255,255,0.07)'
+          e.currentTarget.style.borderColor = 'rgba(153,102,203,0.55)'
+        }}
       >
-        Get Ticket Alerts
+        <span
+          style={{
+            fontSize: '0.82rem',
+            fontWeight: 900,
+            fontStyle: 'italic',
+            letterSpacing: '-0.01em',
+            background:
+              'linear-gradient(90deg, #fff 0%, #ddb4ff 15%, #9966CB 35%, #cc88ff 50%, #9966CB 65%, #ddb4ff 85%, #fff 100%)',
+            backgroundSize: '250% auto',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            backgroundClip: 'text',
+            animation: 'shimmer-loop 4s linear infinite',
+          }}
+        >
+          Get Ticket Alerts
+        </span>
       </button>
 
       {/* Modal — always in the DOM, shown/hidden via display so the Beehiiv
