@@ -40,12 +40,12 @@ export default function EventCard({ event }: { event: Event }) {
             {event.sport}
           </span>
           <div className="text-right">
-            <p className="text-xs font-medium text-gray-500">
+            <p className="text-xs font-bold text-gray-500">
               {isPast  && <span title="Event may be in progress or recently started">🔴 </span>}
               {!isPast && isSoon && <span title="Starting within 72 hours">🗓️ </span>}
               {formatDate(event.date)}
             </p>
-            <p className="text-xs text-gray-400">{event.time}</p>
+            <p className="text-xs font-bold text-gray-400">{event.time}</p>
           </div>
         </div>
 
