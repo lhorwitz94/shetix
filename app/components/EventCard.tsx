@@ -45,7 +45,7 @@ export default function EventCard({ event }: { event: Event }) {
               {!isPast && isSoon && <span title="Starting within 72 hours">🗓️ </span>}
               {formatDate(event.date)}
             </p>
-            <p className="text-xs font-bold text-gray-400">{event.time}</p>
+            <p className="text-xs font-bold text-gray-400">{event.time} ET</p>
           </div>
         </div>
 
