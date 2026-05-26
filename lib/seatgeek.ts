@@ -78,7 +78,7 @@ async function fetchSport(sport: Sport, keyword: string): Promise<Event[]> {
     sort: 'datetime_local.asc',
   })
 
-  const res = await fetch(`${BASE}?${params}`)
+  const res = await fetch(`${BASE}?${params}`, { cache: 'no-store' })
   if (!res.ok) return []
 
   const data: SGResponse = await res.json()

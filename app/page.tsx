@@ -2,6 +2,9 @@ import { Suspense } from 'react'
 import EventsFetcher from './components/EventsFetcher'
 import EventsSkeleton from './components/EventsSkeleton'
 
+// Force this page to SSR on every request so event listings are always fresh
+export const dynamic = 'force-dynamic'
+
 const W_TEXTURE = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='44'%3E%3Cpath d='M0 0 L20 34 L40 14 L60 34 L80 0' stroke='%239966CB' stroke-width='1.5' fill='none' opacity='0.15'/%3E%3C/svg%3E")`
 
 export default function Home() {

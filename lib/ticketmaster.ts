@@ -95,7 +95,7 @@ async function fetchSport({ sport, keyword, classificationName, countryCode }: Q
   if (classificationName) params.set('classificationName', classificationName)
   if (countryCode) params.set('countryCode', countryCode)
 
-  const res = await fetch(`${BASE}?${params}`)
+  const res = await fetch(`${BASE}?${params}`, { cache: 'no-store' })
   if (!res.ok) return []
 
   const data: TMPage = await res.json()
