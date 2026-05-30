@@ -83,15 +83,18 @@ export default function CalendarClient({ events }: { events: Event[] }) {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
-      {/* Back link + month nav */}
-      <div className="flex items-center justify-between mb-6">
-        <Link href="/" className="text-sm font-medium text-gray-400 hover:text-gray-700 flex items-center gap-1 transition-colors">
+      {/* Back link */}
+      <div className="mb-4">
+        <Link href="/" className="text-sm font-medium text-gray-400 hover:text-gray-700 flex items-center gap-1 transition-colors w-fit">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M19 12H5M12 19l-7-7 7-7"/>
           </svg>
           Back to listings
         </Link>
+      </div>
 
+      {/* Month nav — centered */}
+      <div className="flex flex-col items-center gap-3 mb-6">
         <div className="flex items-center gap-4">
           <button onClick={prevMonth} className="w-9 h-9 flex items-center justify-center rounded-full bg-white border border-gray-200 hover:border-[#9966CB] hover:text-[#9966CB] transition-colors">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
@@ -104,8 +107,8 @@ export default function CalendarClient({ events }: { events: Event[] }) {
           </button>
         </div>
 
-        {/* Sport legend */}
-        <div className="hidden lg:flex items-center gap-3 flex-wrap justify-end">
+        {/* Sport legend — centered, below month nav */}
+        <div className="flex items-center gap-4 flex-wrap justify-center">
           {Object.entries(SPORT_COLORS).map(([sport, colors]) => (
             <span key={sport} className="flex items-center gap-1 text-xs font-semibold" style={{ color: colors.text }}>
               <span className="w-2 h-2 rounded-full inline-block" style={{ background: colors.text }} />
@@ -157,9 +160,12 @@ export default function CalendarClient({ events }: { events: Event[] }) {
                       <EventPill key={e.id} event={e} />
                     ))}
                     {dayEvents.length > MAX_VISIBLE && (
-                      <div className="text-[10px] font-semibold text-[#9966CB] pl-1">
+                      <button
+                        onClick={e => { e.stopPropagation(); setSelectedDate(dateStr) }}
+                        className="text-[10px] font-semibold text-[#9966CB] pl-1 hover:underline"
+                      >
                         +{dayEvents.length - MAX_VISIBLE} more
-                      </div>
+                      </button>
                     )}
                   </>
                 )}
