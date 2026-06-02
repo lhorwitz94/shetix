@@ -36,9 +36,11 @@ function formatFullDate(dateStr: string) {
   })
 }
 
-// ── Modals ────────────────────────────────────────────────────────────────────
+// ── Event detail modal ────────────────────────────────────────────────────────
 
-function Overlay({ onClose, children }: { onClose: () => void; children: React.ReactNode }) {
+function EventDetailModal({ event, onClose }: { event: Event; onClose: () => void }) {
+  const colors = SPORT_COLORS[event.sport] ?? { bg: '#f3f4f6', text: '#374151' }
+
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
     window.addEventListener('keydown', onKey)
@@ -54,132 +56,61 @@ function Overlay({ onClose, children }: { onClose: () => void; children: React.R
         background: 'rgba(0,0,0,0.65)',
       }}
     >
-      <div onClick={e => e.stopPropagation()}>
-        {children}
-      </div>
-    </div>
-  )
-}
-
-function CloseBtn({ onClose }: { onClose: () => void }) {
-  return (
-    <button
-      onClick={onClose}
-      aria-label="Close"
-      style={{
-        position: 'absolute', top: 12, right: 14, zIndex: 10,
-        background: 'rgba(0,0,0,0.07)', border: 'none', borderRadius: '50%',
-        width: 28, height: 28, cursor: 'pointer', fontSize: 14, color: '#555',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-      }}
-    >✕</button>
-  )
-}
-
-function EventDetailModal({ event, onClose }: { event: Event; onClose: () => void }) {
-  const colors = SPORT_COLORS[event.sport] ?? { bg: '#f3f4f6', text: '#374151' }
-  return (
-    <Overlay onClose={onClose}>
-      <div style={{
-        background: '#fff', borderRadius: 20, width: 'min(440px, 92vw)',
-        padding: '28px 28px 24px', position: 'relative',
-      }}>
-        <CloseBtn onClose={onClose} />
-        <span
+      <div
+        onClick={e => e.stopPropagation()}
+        style={{
+          background: '#fff', borderRadius: 20, width: 'min(440px, 92vw)',
+          padding: '28px 28px 24px', position: 'relative',
+        }}
+      >
+        {/* Close */}
+        <button
+          onClick={onClose}
+          aria-label="Close"
           style={{
-            display: 'inline-block', fontSize: 11, fontWeight: 700,
-            padding: '3px 10px', borderRadius: 999, marginBottom: 14,
-            background: colors.bg, color: colors.text, letterSpacing: '0.04em',
-            textTransform: 'uppercase',
+            position: 'absolute', top: 12, right: 14, background: 'rgba(0,0,0,0.07)',
+            border: 'none', borderRadius: '50%', width: 28, height: 28,
+            cursor: 'pointer', fontSize: 14, color: '#555',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
           }}
-        >
+        >✕</button>
+
+        <span style={{
+          display: 'inline-block', fontSize: 11, fontWeight: 700,
+          padding: '3px 10px', borderRadius: 999, marginBottom: 14,
+          background: colors.bg, color: colors.text,
+          letterSpacing: '0.04em', textTransform: 'uppercase',
+        }}>
           {event.sport}
         </span>
         <h2 style={{ fontSize: 18, fontWeight: 800, color: '#111', lineHeight: 1.3, marginBottom: 16 }}>
           {event.title}
         </h2>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          <Row icon="📅" label={formatFullDate(event.date)} />
-          <Row icon="🕐" label={`${event.time} ET`} />
-          <Row icon="📍" label={`${event.venue} · ${event.city}, ${event.state}`} />
+          {[
+            { icon: '📅', label: formatFullDate(event.date) },
+            { icon: '🕐', label: `${event.time} ET` },
+            { icon: '📍', label: `${event.venue} · ${event.city}, ${event.state}` },
+          ].map(({ icon, label }) => (
+            <div key={icon} style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
+              <span style={{ fontSize: 15, lineHeight: '20px', flexShrink: 0 }}>{icon}</span>
+              <span style={{ fontSize: 13, color: '#444', lineHeight: '20px' }}>{label}</span>
+            </div>
+          ))}
         </div>
       </div>
-    </Overlay>
-  )
-}
-
-function Row({ icon, label }: { icon: string; label: string }) {
-  return (
-    <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
-      <span style={{ fontSize: 15, lineHeight: '20px', flexShrink: 0 }}>{icon}</span>
-      <span style={{ fontSize: 13, color: '#444', lineHeight: '20px' }}>{label}</span>
     </div>
   )
 }
 
-function DayModal({
-  date, dayEvents, onClose, onSelectEvent,
-}: {
-  date: string; dayEvents: Event[]; onClose: () => void; onSelectEvent: (e: Event) => void
-}) {
-  return (
-    <Overlay onClose={onClose}>
-      <div style={{
-        background: '#fff', borderRadius: 20, width: 'min(480px, 92vw)',
-        maxHeight: '80vh', overflowY: 'auto', padding: '24px 24px 20px',
-        position: 'relative',
-      }}>
-        <CloseBtn onClose={onClose} />
-        <h3 style={{ fontSize: 15, fontWeight: 800, color: '#111', marginBottom: 16 }}>
-          {formatFullDate(date)}
-        </h3>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-          {dayEvents.map(e => {
-            const colors = SPORT_COLORS[e.sport] ?? { bg: '#f3f4f6', text: '#374151' }
-            return (
-              <button
-                key={e.id}
-                onClick={() => onSelectEvent(e)}
-                style={{
-                  display: 'flex', alignItems: 'center', gap: 10,
-                  background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: 12,
-                  padding: '10px 14px', cursor: 'pointer', textAlign: 'left', width: '100%',
-                  transition: 'border-color 0.15s',
-                }}
-                onMouseEnter={el => (el.currentTarget.style.borderColor = '#9966CB')}
-                onMouseLeave={el => (el.currentTarget.style.borderColor = '#e5e7eb')}
-              >
-                <span style={{
-                  fontSize: 10, fontWeight: 700, padding: '2px 8px', borderRadius: 999,
-                  background: colors.bg, color: colors.text, flexShrink: 0,
-                  textTransform: 'uppercase', letterSpacing: '0.04em',
-                }}>
-                  {e.sport}
-                </span>
-                <span style={{ fontSize: 13, fontWeight: 600, color: '#111', flex: 1, minWidth: 0 }}
-                  className="truncate">
-                  {e.title}
-                </span>
-                <span style={{ fontSize: 12, color: '#888', flexShrink: 0, fontWeight: 600 }}>
-                  {e.time} ET
-                </span>
-              </button>
-            )
-          })}
-        </div>
-      </div>
-    </Overlay>
-  )
-}
-
-// ── Calendar pill (clickable) ─────────────────────────────────────────────────
+// ── Calendar pill ─────────────────────────────────────────────────────────────
 
 function EventPill({ event, onClick }: { event: Event; onClick: () => void }) {
   const colors = SPORT_COLORS[event.sport] ?? { bg: '#f3f4f6', text: '#374151' }
   return (
     <button
       onClick={e => { e.stopPropagation(); onClick() }}
-      className="flex items-center gap-1 rounded-md px-1.5 py-0.5 mb-0.5 min-w-0 w-full text-left hover:opacity-80 transition-opacity"
+      className="flex items-center gap-1 rounded-md px-1.5 py-0.5 mb-0.5 min-w-0 w-full text-left hover:opacity-75 transition-opacity"
       style={{ background: colors.bg }}
     >
       <span className="text-[9px] font-bold shrink-0 uppercase tracking-wide" style={{ color: colors.text }}>
@@ -190,18 +121,14 @@ function EventPill({ event, onClick }: { event: Event; onClick: () => void }) {
   )
 }
 
-// ── Main component ────────────────────────────────────────────────────────────
-
-type ModalState =
-  | { type: 'event'; event: Event }
-  | { type: 'day'; date: string; events: Event[] }
-  | null
+// ── Main ──────────────────────────────────────────────────────────────────────
 
 export default function CalendarClient({ events }: { events: Event[] }) {
   const today = new Date()
   const [year, setYear] = useState(today.getFullYear())
   const [month, setMonth] = useState(today.getMonth())
-  const [modal, setModal] = useState<ModalState>(null)
+  const [selectedDate, setSelectedDate] = useState<string | null>(null)
+  const [modalEvent, setModalEvent] = useState<Event | null>(null)
 
   const eventsByDate = useMemo(() => {
     const map = new Map<string, Event[]>()
@@ -213,12 +140,15 @@ export default function CalendarClient({ events }: { events: Event[] }) {
   }, [events])
 
   const cells = useMemo(() => getCalendarCells(year, month), [year, month])
+  const selectedEvents = selectedDate ? (eventsByDate.get(selectedDate) ?? []) : []
 
   function prevMonth() {
     if (month === 0) { setMonth(11); setYear(y => y - 1) } else setMonth(m => m - 1)
+    setSelectedDate(null)
   }
   function nextMonth() {
     if (month === 11) { setMonth(0); setYear(y => y + 1) } else setMonth(m => m + 1)
+    setSelectedDate(null)
   }
 
   return (
@@ -255,6 +185,44 @@ export default function CalendarClient({ events }: { events: Event[] }) {
         </div>
       </div>
 
+      {/* ── Events panel — shown above the grid when a day is selected ── */}
+      {selectedDate && (
+        <div className="mb-6">
+          <h3 className="text-sm font-bold text-gray-700 mb-3">
+            {formatFullDate(selectedDate)}
+            <button onClick={() => setSelectedDate(null)} className="ml-3 text-xs font-medium text-gray-400 hover:text-gray-600">clear</button>
+          </h3>
+          {selectedEvents.length === 0 ? (
+            <p className="text-sm text-gray-400">No events on this day.</p>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+              {selectedEvents.map(e => {
+                const colors = SPORT_COLORS[e.sport] ?? { bg: '#f3f4f6', text: '#374151' }
+                return (
+                  <button
+                    key={e.id}
+                    onClick={() => setModalEvent(e)}
+                    className="flex items-center gap-3 bg-white border border-gray-100 rounded-xl px-4 py-3 text-left hover:border-[#9966CB] transition-colors shadow-sm"
+                  >
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full shrink-0"
+                      style={{ background: colors.bg, color: colors.text }}>
+                      {e.sport}
+                    </span>
+                    <span className="text-xs font-semibold text-gray-800 flex-1 truncate">{e.title}</span>
+                    <span className="text-xs text-gray-400 font-bold shrink-0">{e.time} ET</span>
+                  </button>
+                )
+              })}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Instruction header above the calendar grid */}
+      <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-3 text-center">
+        Select a day to see the full women&apos;s sports schedule
+      </p>
+
       {/* Calendar grid */}
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
         <div className="grid grid-cols-7 border-b border-gray-100">
@@ -267,26 +235,26 @@ export default function CalendarClient({ events }: { events: Event[] }) {
             const dateStr = day ? `${year}-${padDate(month + 1)}-${padDate(day)}` : null
             const dayEvents = dateStr ? (eventsByDate.get(dateStr) ?? []) : []
             const isToday = dateStr === `${today.getFullYear()}-${padDate(today.getMonth() + 1)}-${padDate(today.getDate())}`
+            const isSelected = dateStr === selectedDate
             const MAX_VISIBLE = 3
 
             return (
               <div
                 key={i}
-                className={`min-h-[100px] border-b border-r border-gray-100 p-1.5 transition-colors ${dayEvents.length > 0 ? 'hover:bg-gray-50' : ''}`}
+                onClick={() => day && setSelectedDate(isSelected ? null : dateStr)}
+                className={`min-h-[100px] border-b border-r border-gray-100 p-1.5 transition-colors ${day ? 'cursor-pointer' : ''} ${isSelected ? 'bg-violet-50' : dayEvents.length > 0 ? 'hover:bg-gray-50' : ''}`}
               >
                 {day && (
                   <>
-                    <div className={`text-xs font-bold mb-1 w-6 h-6 flex items-center justify-center rounded-full ${
-                      isToday ? 'bg-[#9966CB] text-white' : 'text-gray-500'
-                    }`}>
+                    <div className={`text-xs font-bold mb-1 w-6 h-6 flex items-center justify-center rounded-full ${isToday ? 'bg-[#9966CB] text-white' : 'text-gray-500'}`}>
                       {day}
                     </div>
                     {dayEvents.slice(0, MAX_VISIBLE).map(e => (
-                      <EventPill key={e.id} event={e} onClick={() => setModal({ type: 'event', event: e })} />
+                      <EventPill key={e.id} event={e} onClick={() => setModalEvent(e)} />
                     ))}
                     {dayEvents.length > MAX_VISIBLE && (
                       <button
-                        onClick={() => setModal({ type: 'day', date: dateStr!, events: dayEvents })}
+                        onClick={ev => { ev.stopPropagation(); setSelectedDate(dateStr) }}
                         className="text-[10px] font-semibold text-[#9966CB] pl-1 hover:underline"
                       >
                         +{dayEvents.length - MAX_VISIBLE} more
@@ -300,20 +268,9 @@ export default function CalendarClient({ events }: { events: Event[] }) {
         </div>
       </div>
 
-      {/* Modals */}
-      {modal?.type === 'event' && (
-        <EventDetailModal
-          event={modal.event}
-          onClose={() => setModal(null)}
-        />
-      )}
-      {modal?.type === 'day' && (
-        <DayModal
-          date={modal.date}
-          dayEvents={modal.events}
-          onClose={() => setModal(null)}
-          onSelectEvent={e => setModal({ type: 'event', event: e })}
-        />
+      {/* Event detail modal */}
+      {modalEvent && (
+        <EventDetailModal event={modalEvent} onClose={() => setModalEvent(null)} />
       )}
     </div>
   )
