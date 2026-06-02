@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import Link from 'next/link'
 import type { Event } from '@/lib/types'
 
@@ -19,9 +19,7 @@ const MONTHS = [
   'July','August','September','October','November','December',
 ]
 
-function padDate(n: number) {
-  return String(n).padStart(2, '0')
-}
+function padDate(n: number) { return String(n).padStart(2, '0') }
 
 function getCalendarCells(year: number, month: number): (number | null)[] {
   const firstDow = new Date(year, month, 1).getDay()
@@ -32,29 +30,178 @@ function getCalendarCells(year: number, month: number): (number | null)[] {
   return cells
 }
 
-function EventPill({ event }: { event: Event }) {
-  const colors = SPORT_COLORS[event.sport] ?? { bg: '#f3f4f6', text: '#374151' }
+function formatFullDate(dateStr: string) {
+  return new Date(dateStr + 'T00:00:00').toLocaleDateString('en-US', {
+    weekday: 'long', month: 'long', day: 'numeric', year: 'numeric',
+  })
+}
+
+// ── Modals ────────────────────────────────────────────────────────────────────
+
+function Overlay({ onClose, children }: { onClose: () => void; children: React.ReactNode }) {
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [onClose])
+
   return (
     <div
-      className="flex items-center gap-1 rounded-md px-1.5 py-0.5 mb-0.5 min-w-0"
-      style={{ background: colors.bg }}
+      onClick={onClose}
+      style={{
+        position: 'fixed', inset: 0, zIndex: 400,
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        background: 'rgba(0,0,0,0.65)',
+      }}
     >
-      <span
-        className="text-[9px] font-bold shrink-0 uppercase tracking-wide"
-        style={{ color: colors.text }}
-      >
-        {event.sport}
-      </span>
-      <span className="text-[10px] text-gray-700 truncate">{event.title}</span>
+      <div onClick={e => e.stopPropagation()}>
+        {children}
+      </div>
     </div>
   )
 }
+
+function CloseBtn({ onClose }: { onClose: () => void }) {
+  return (
+    <button
+      onClick={onClose}
+      aria-label="Close"
+      style={{
+        position: 'absolute', top: 12, right: 14, zIndex: 10,
+        background: 'rgba(0,0,0,0.07)', border: 'none', borderRadius: '50%',
+        width: 28, height: 28, cursor: 'pointer', fontSize: 14, color: '#555',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+      }}
+    >✕</button>
+  )
+}
+
+function EventDetailModal({ event, onClose }: { event: Event; onClose: () => void }) {
+  const colors = SPORT_COLORS[event.sport] ?? { bg: '#f3f4f6', text: '#374151' }
+  return (
+    <Overlay onClose={onClose}>
+      <div style={{
+        background: '#fff', borderRadius: 20, width: 'min(440px, 92vw)',
+        padding: '28px 28px 24px', position: 'relative',
+      }}>
+        <CloseBtn onClose={onClose} />
+        <span
+          style={{
+            display: 'inline-block', fontSize: 11, fontWeight: 700,
+            padding: '3px 10px', borderRadius: 999, marginBottom: 14,
+            background: colors.bg, color: colors.text, letterSpacing: '0.04em',
+            textTransform: 'uppercase',
+          }}
+        >
+          {event.sport}
+        </span>
+        <h2 style={{ fontSize: 18, fontWeight: 800, color: '#111', lineHeight: 1.3, marginBottom: 16 }}>
+          {event.title}
+        </h2>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <Row icon="📅" label={formatFullDate(event.date)} />
+          <Row icon="🕐" label={`${event.time} ET`} />
+          <Row icon="📍" label={`${event.venue} · ${event.city}, ${event.state}`} />
+        </div>
+      </div>
+    </Overlay>
+  )
+}
+
+function Row({ icon, label }: { icon: string; label: string }) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
+      <span style={{ fontSize: 15, lineHeight: '20px', flexShrink: 0 }}>{icon}</span>
+      <span style={{ fontSize: 13, color: '#444', lineHeight: '20px' }}>{label}</span>
+    </div>
+  )
+}
+
+function DayModal({
+  date, dayEvents, onClose, onSelectEvent,
+}: {
+  date: string; dayEvents: Event[]; onClose: () => void; onSelectEvent: (e: Event) => void
+}) {
+  return (
+    <Overlay onClose={onClose}>
+      <div style={{
+        background: '#fff', borderRadius: 20, width: 'min(480px, 92vw)',
+        maxHeight: '80vh', overflowY: 'auto', padding: '24px 24px 20px',
+        position: 'relative',
+      }}>
+        <CloseBtn onClose={onClose} />
+        <h3 style={{ fontSize: 15, fontWeight: 800, color: '#111', marginBottom: 16 }}>
+          {formatFullDate(date)}
+        </h3>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          {dayEvents.map(e => {
+            const colors = SPORT_COLORS[e.sport] ?? { bg: '#f3f4f6', text: '#374151' }
+            return (
+              <button
+                key={e.id}
+                onClick={() => onSelectEvent(e)}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: 10,
+                  background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: 12,
+                  padding: '10px 14px', cursor: 'pointer', textAlign: 'left', width: '100%',
+                  transition: 'border-color 0.15s',
+                }}
+                onMouseEnter={el => (el.currentTarget.style.borderColor = '#9966CB')}
+                onMouseLeave={el => (el.currentTarget.style.borderColor = '#e5e7eb')}
+              >
+                <span style={{
+                  fontSize: 10, fontWeight: 700, padding: '2px 8px', borderRadius: 999,
+                  background: colors.bg, color: colors.text, flexShrink: 0,
+                  textTransform: 'uppercase', letterSpacing: '0.04em',
+                }}>
+                  {e.sport}
+                </span>
+                <span style={{ fontSize: 13, fontWeight: 600, color: '#111', flex: 1, minWidth: 0 }}
+                  className="truncate">
+                  {e.title}
+                </span>
+                <span style={{ fontSize: 12, color: '#888', flexShrink: 0, fontWeight: 600 }}>
+                  {e.time} ET
+                </span>
+              </button>
+            )
+          })}
+        </div>
+      </div>
+    </Overlay>
+  )
+}
+
+// ── Calendar pill (clickable) ─────────────────────────────────────────────────
+
+function EventPill({ event, onClick }: { event: Event; onClick: () => void }) {
+  const colors = SPORT_COLORS[event.sport] ?? { bg: '#f3f4f6', text: '#374151' }
+  return (
+    <button
+      onClick={e => { e.stopPropagation(); onClick() }}
+      className="flex items-center gap-1 rounded-md px-1.5 py-0.5 mb-0.5 min-w-0 w-full text-left hover:opacity-80 transition-opacity"
+      style={{ background: colors.bg }}
+    >
+      <span className="text-[9px] font-bold shrink-0 uppercase tracking-wide" style={{ color: colors.text }}>
+        {event.sport}
+      </span>
+      <span className="text-[10px] text-gray-700 truncate">{event.title}</span>
+    </button>
+  )
+}
+
+// ── Main component ────────────────────────────────────────────────────────────
+
+type ModalState =
+  | { type: 'event'; event: Event }
+  | { type: 'day'; date: string; events: Event[] }
+  | null
 
 export default function CalendarClient({ events }: { events: Event[] }) {
   const today = new Date()
   const [year, setYear] = useState(today.getFullYear())
   const [month, setMonth] = useState(today.getMonth())
-  const [selectedDate, setSelectedDate] = useState<string | null>(null)
+  const [modal, setModal] = useState<ModalState>(null)
 
   const eventsByDate = useMemo(() => {
     const map = new Map<string, Event[]>()
@@ -68,17 +215,11 @@ export default function CalendarClient({ events }: { events: Event[] }) {
   const cells = useMemo(() => getCalendarCells(year, month), [year, month])
 
   function prevMonth() {
-    if (month === 0) { setMonth(11); setYear(y => y - 1) }
-    else setMonth(m => m - 1)
-    setSelectedDate(null)
+    if (month === 0) { setMonth(11); setYear(y => y - 1) } else setMonth(m => m - 1)
   }
   function nextMonth() {
-    if (month === 11) { setMonth(0); setYear(y => y + 1) }
-    else setMonth(m => m + 1)
-    setSelectedDate(null)
+    if (month === 11) { setMonth(0); setYear(y => y + 1) } else setMonth(m => m + 1)
   }
-
-  const selectedEvents = selectedDate ? (eventsByDate.get(selectedDate) ?? []) : []
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -93,21 +234,17 @@ export default function CalendarClient({ events }: { events: Event[] }) {
         </Link>
       </div>
 
-      {/* Month nav — centered */}
+      {/* Month nav + legend — centered */}
       <div className="flex flex-col items-center gap-3 mb-6">
         <div className="flex items-center gap-4">
           <button onClick={prevMonth} className="w-9 h-9 flex items-center justify-center rounded-full bg-white border border-gray-200 hover:border-[#9966CB] hover:text-[#9966CB] transition-colors">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
           </button>
-          <h2 className="text-xl font-bold text-gray-900 w-44 text-center">
-            {MONTHS[month]} {year}
-          </h2>
+          <h2 className="text-xl font-bold text-gray-900 w-44 text-center">{MONTHS[month]} {year}</h2>
           <button onClick={nextMonth} className="w-9 h-9 flex items-center justify-center rounded-full bg-white border border-gray-200 hover:border-[#9966CB] hover:text-[#9966CB] transition-colors">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18l6-6-6-6"/></svg>
           </button>
         </div>
-
-        {/* Sport legend — centered, below month nav */}
         <div className="flex items-center gap-4 flex-wrap justify-center">
           {Object.entries(SPORT_COLORS).map(([sport, colors]) => (
             <span key={sport} className="flex items-center gap-1 text-xs font-semibold" style={{ color: colors.text }}>
@@ -120,48 +257,36 @@ export default function CalendarClient({ events }: { events: Event[] }) {
 
       {/* Calendar grid */}
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-        {/* Day headers */}
         <div className="grid grid-cols-7 border-b border-gray-100">
           {DAYS.map(d => (
-            <div key={d} className="py-2 text-center text-xs font-bold text-gray-400 uppercase tracking-wide">
-              {d}
-            </div>
+            <div key={d} className="py-2 text-center text-xs font-bold text-gray-400 uppercase tracking-wide">{d}</div>
           ))}
         </div>
-
-        {/* Cells */}
         <div className="grid grid-cols-7">
           {cells.map((day, i) => {
             const dateStr = day ? `${year}-${padDate(month + 1)}-${padDate(day)}` : null
             const dayEvents = dateStr ? (eventsByDate.get(dateStr) ?? []) : []
             const isToday = dateStr === `${today.getFullYear()}-${padDate(today.getMonth() + 1)}-${padDate(today.getDate())}`
-            const isSelected = dateStr === selectedDate
-            const hasEvents = dayEvents.length > 0
             const MAX_VISIBLE = 3
 
             return (
               <div
                 key={i}
-                onClick={() => day && setSelectedDate(isSelected ? null : dateStr)}
-                className={`min-h-[100px] border-b border-r border-gray-100 p-1.5 transition-colors ${
-                  day ? 'cursor-pointer' : ''
-                } ${isSelected ? 'bg-violet-50' : hasEvents ? 'hover:bg-gray-50' : ''}`}
+                className={`min-h-[100px] border-b border-r border-gray-100 p-1.5 transition-colors ${dayEvents.length > 0 ? 'hover:bg-gray-50' : ''}`}
               >
                 {day && (
                   <>
                     <div className={`text-xs font-bold mb-1 w-6 h-6 flex items-center justify-center rounded-full ${
-                      isToday
-                        ? 'bg-[#9966CB] text-white'
-                        : 'text-gray-500'
+                      isToday ? 'bg-[#9966CB] text-white' : 'text-gray-500'
                     }`}>
                       {day}
                     </div>
                     {dayEvents.slice(0, MAX_VISIBLE).map(e => (
-                      <EventPill key={e.id} event={e} />
+                      <EventPill key={e.id} event={e} onClick={() => setModal({ type: 'event', event: e })} />
                     ))}
                     {dayEvents.length > MAX_VISIBLE && (
                       <button
-                        onClick={e => { e.stopPropagation(); setSelectedDate(dateStr) }}
+                        onClick={() => setModal({ type: 'day', date: dateStr!, events: dayEvents })}
                         className="text-[10px] font-semibold text-[#9966CB] pl-1 hover:underline"
                       >
                         +{dayEvents.length - MAX_VISIBLE} more
@@ -175,39 +300,20 @@ export default function CalendarClient({ events }: { events: Event[] }) {
         </div>
       </div>
 
-      {/* Selected day detail panel */}
-      {selectedDate && selectedEvents.length > 0 && (
-        <div className="mt-6">
-          <h3 className="text-base font-bold text-gray-900 mb-3">
-            {new Date(selectedDate + 'T00:00:00').toLocaleDateString('en-US', {
-              weekday: 'long', month: 'long', day: 'numeric', year: 'numeric',
-            })}
-          </h3>
-          <div className="flex flex-col gap-3">
-            {selectedEvents.map(e => {
-              const colors = SPORT_COLORS[e.sport] ?? { bg: '#f3f4f6', text: '#374151' }
-              return (
-                <div key={e.id} className="bg-white rounded-xl border border-gray-100 shadow-sm px-5 py-4 flex items-start gap-4">
-                  <span
-                    className="text-xs font-bold px-2.5 py-1 rounded-full shrink-0 mt-0.5"
-                    style={{ background: colors.bg, color: colors.text }}
-                  >
-                    {e.sport}
-                  </span>
-                  <div className="min-w-0 flex-1">
-                    <p className="font-bold text-gray-900 text-sm leading-snug">{e.title}</p>
-                    <p className="text-xs text-gray-500 mt-0.5">
-                      {e.venue} · {e.city}, {e.state}
-                    </p>
-                  </div>
-                  <div className="text-right shrink-0">
-                    <p className="text-xs font-bold text-gray-700">{e.time} ET</p>
-                  </div>
-                </div>
-              )
-            })}
-          </div>
-        </div>
+      {/* Modals */}
+      {modal?.type === 'event' && (
+        <EventDetailModal
+          event={modal.event}
+          onClose={() => setModal(null)}
+        />
+      )}
+      {modal?.type === 'day' && (
+        <DayModal
+          date={modal.date}
+          dayEvents={modal.events}
+          onClose={() => setModal(null)}
+          onSelectEvent={e => setModal({ type: 'event', event: e })}
+        />
       )}
     </div>
   )
