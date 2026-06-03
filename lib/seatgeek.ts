@@ -74,7 +74,7 @@ async function fetchSport(sport: Sport, keyword: string): Promise<Event[]> {
     client_id: process.env.SEATGEEK_CLIENT_ID!,
     q: keyword,
     'datetime_local.gte': todayLocal(),
-    per_page: '50',
+    per_page: '200',
     sort: 'datetime_local.asc',
   })
 

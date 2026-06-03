@@ -88,7 +88,7 @@ async function fetchSport({ sport, keyword, classificationName, countryCode }: Q
     apikey: process.env.TICKETMASTER_API_KEY!,
     segmentName: 'Sports',
     startDateTime: todayISO(),
-    size: '50',
+    size: '200',
     sort: 'date,asc',
   })
   if (keyword) params.set('keyword', keyword)
