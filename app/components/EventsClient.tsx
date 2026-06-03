@@ -106,7 +106,7 @@ export default function EventsClient({ events }: { events: Event[] }) {
             <button
               key={sport}
               onClick={() => setActiveSport(sport)}
-              className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all ${
+              className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all whitespace-nowrap flex-shrink-0 ${
                 activeSport === sport
                   ? 'bg-[#9966CB] text-white shadow-sm'
                   : 'bg-white border border-gray-200 text-gray-600 hover:border-[#c4a0e0] hover:text-[#9966CB]'

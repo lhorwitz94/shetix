@@ -269,13 +269,13 @@ export default function CalendarClient({ events }: { events: Event[] }) {
         </div>
       )}
 
-      {/* Instruction header above the calendar grid */}
+      {/* Instruction header */}
       <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-3 text-center">
         Select a day to see the full women&apos;s sports schedule
       </p>
 
-      {/* Calendar grid */}
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+      {/* ── Desktop: 7-column calendar grid (hidden on mobile) ── */}
+      <div className="hidden sm:block bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
         <div className="grid grid-cols-7 border-b border-gray-100">
           {DAYS.map(d => (
             <div key={d} className="py-2 text-center text-xs font-bold text-gray-400 uppercase tracking-wide">{d}</div>
@@ -288,7 +288,6 @@ export default function CalendarClient({ events }: { events: Event[] }) {
             const isToday = dateStr === `${today.getFullYear()}-${padDate(today.getMonth() + 1)}-${padDate(today.getDate())}`
             const isSelected = dateStr === selectedDate
             const MAX_VISIBLE = 3
-
             return (
               <div
                 key={i}
@@ -317,6 +316,58 @@ export default function CalendarClient({ events }: { events: Event[] }) {
             )
           })}
         </div>
+      </div>
+
+      {/* ── Mobile: date-grouped list (shown only on mobile) ── */}
+      <div className="sm:hidden flex flex-col gap-4">
+        {(() => {
+          const daysInMonth = new Date(year, month + 1, 0).getDate()
+          const todayStr = `${today.getFullYear()}-${padDate(today.getMonth() + 1)}-${padDate(today.getDate())}`
+          const groups: { dateStr: string; day: number; events: Event[] }[] = []
+          for (let d = 1; d <= daysInMonth; d++) {
+            const dateStr = `${year}-${padDate(month + 1)}-${padDate(d)}`
+            const dayEvents = eventsByDate.get(dateStr) ?? []
+            if (dayEvents.length > 0) groups.push({ dateStr, day: d, events: dayEvents })
+          }
+          if (groups.length === 0) {
+            return <p className="text-sm text-gray-400 text-center py-8">No events this month.</p>
+          }
+          return groups.map(({ dateStr, day, events: dayEvents }) => {
+            const isToday = dateStr === todayStr
+            const label = new Date(dateStr + 'T00:00:00').toLocaleDateString('en-US', {
+              weekday: 'short', month: 'short', day: 'numeric',
+            })
+            return (
+              <div key={dateStr} className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+                {/* Date header */}
+                <div className={`px-4 py-2.5 flex items-center gap-2 border-b border-gray-100 ${isToday ? 'bg-[#9966CB]' : 'bg-gray-50'}`}>
+                  <span className={`text-sm font-bold ${isToday ? 'text-white' : 'text-gray-700'}`}>{label}</span>
+                  {isToday && <span className="text-[10px] font-bold text-white/80 uppercase tracking-wide">Today</span>}
+                </div>
+                {/* Event rows */}
+                <div className="flex flex-col divide-y divide-gray-100">
+                  {dayEvents.map(e => {
+                    const colors = SPORT_COLORS[e.sport] ?? { bg: '#f3f4f6', text: '#374151' }
+                    return (
+                      <button
+                        key={e.id}
+                        onClick={() => setModalEvent(e)}
+                        className="flex items-center gap-3 px-4 py-3 text-left w-full hover:bg-gray-50 transition-colors"
+                      >
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full shrink-0 whitespace-nowrap"
+                          style={{ background: colors.bg, color: colors.text }}>
+                          {e.sport}
+                        </span>
+                        <span className="text-sm font-semibold text-gray-800 flex-1 min-w-0 truncate">{e.title}</span>
+                        <span className="text-xs font-bold text-gray-400 shrink-0 whitespace-nowrap">{e.time} ET</span>
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+            )
+          })
+        })()}
       </div>
 
       {/* Event detail modal */}
