@@ -211,7 +211,7 @@ export default function CalendarClient({ events }: { events: Event[] }) {
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M19 12H5M12 19l-7-7 7-7"/>
           </svg>
-          Back to listings
+          See all ticket listings
         </Link>
       </div>
 
@@ -271,7 +271,7 @@ export default function CalendarClient({ events }: { events: Event[] }) {
 
       {/* Instruction header */}
       <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-3 text-center">
-        Select a day to see the full women&apos;s sports schedule
+        Select a day to see the full women&apos;s sports schedule or choose your event
       </p>
 
       {/* ── Desktop: 7-column calendar grid (hidden on mobile) ── */}
@@ -340,9 +340,9 @@ export default function CalendarClient({ events }: { events: Event[] }) {
             return (
               <div key={dateStr} className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
                 {/* Date header */}
-                <div className={`px-4 py-2.5 flex items-center gap-2 border-b border-gray-100 ${isToday ? 'bg-[#9966CB]' : 'bg-gray-50'}`}>
-                  <span className={`text-sm font-bold ${isToday ? 'text-white' : 'text-gray-700'}`}>{label}</span>
-                  {isToday && <span className="text-[10px] font-bold text-white/80 uppercase tracking-wide">Today</span>}
+                <div className="px-4 py-2.5 flex items-center gap-2 border-b border-gray-100 bg-[#9966CB]">
+                  <span className="text-sm font-bold text-white">{label}</span>
+                  {isToday && <span className="text-[10px] font-bold text-white/70 uppercase tracking-wide">Today</span>}
                 </div>
                 {/* Event rows */}
                 <div className="flex flex-col divide-y divide-gray-100">
