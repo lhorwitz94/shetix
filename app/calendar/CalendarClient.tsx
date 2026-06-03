@@ -86,7 +86,7 @@ function EventDetailModal({ event, onClose }: { event: Event; onClose: () => voi
         <h2 style={{ fontSize: 18, fontWeight: 800, color: '#111', lineHeight: 1.3, marginBottom: 16 }}>
           {event.title}
         </h2>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 20 }}>
           {[
             { icon: '📅', label: formatFullDate(event.date) },
             { icon: '🕐', label: `${event.time} ET` },
@@ -98,6 +98,57 @@ function EventDetailModal({ event, onClose }: { event: Event; onClose: () => voi
             </div>
           ))}
         </div>
+
+        {/* Ticket CTAs */}
+        {event.markets.length > 0 && (
+          <div style={{ borderTop: '1px solid #f0f0f0', paddingTop: 16, display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {(() => {
+              const priceValues = event.markets.map(m => m.minPrice).filter(p => p > 0)
+              const lowestPrice = priceValues.length > 0 ? Math.min(...priceValues) : null
+              const hasComparablePrices = priceValues.length >= 2
+              const MARKET_TEXT: Record<string, string> = {
+                Ticketmaster: '#1d4ed8',
+                SeatGeek: '#c2410c',
+                StubHub: '#be123c',
+                'Vivid Seats': '#7e22ce',
+              }
+              return event.markets.map(m => {
+                const hasPrice = m.minPrice > 0
+                const isBest = hasComparablePrices && hasPrice && m.minPrice === lowestPrice
+                return (
+                  <a
+                    key={m.market}
+                    href={m.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                      padding: '10px 14px', borderRadius: 12, textDecoration: 'none',
+                      border: `1px solid ${isBest ? '#bbf7d0' : '#e5e7eb'}`,
+                      background: isBest ? '#f0fdf4' : '#f9fafb',
+                      transition: 'border-color 0.15s',
+                    }}
+                  >
+                    <span style={{ fontSize: 12, fontWeight: 700, color: MARKET_TEXT[m.market] ?? '#374151' }}>
+                      {m.market}
+                    </span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      {isBest && (
+                        <span style={{ fontSize: 10, fontWeight: 700, color: '#16a34a', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                          Best price
+                        </span>
+                      )}
+                      <span style={{ fontSize: 13, fontWeight: 700, color: isBest ? '#15803d' : '#374151' }}>
+                        {hasPrice ? `$${m.minPrice}` : 'See tickets'}
+                      </span>
+                      <span style={{ fontSize: 12, color: '#9ca3af' }}>→</span>
+                    </div>
+                  </a>
+                )
+              })
+            })()}
+          </div>
+        )}
       </div>
     </div>
   )
