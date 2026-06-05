@@ -31,6 +31,8 @@ const QUERIES: { sport: Sport; keyword: string }[] = [
   { sport: 'NWSL',    keyword: 'NWSL'        },
   { sport: 'PWHL',    keyword: 'PWHL'        },
   { sport: 'Golf',    keyword: 'LPGA'        },
+  { sport: 'Golf',    keyword: 'KPMG Women'  },
+  { sport: 'Golf',    keyword: 'CPKC Women'  },
   { sport: 'College', keyword: 'NCAA Women'  },
 ]
 
