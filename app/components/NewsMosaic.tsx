@@ -80,12 +80,12 @@ function buildTiles(items: NewsItem[], events: Event[]): Tile[] {
 }
 
 // Same footprint as a regular small news tile (col-span-1 row-span-1,
-// 180px tall) — but unlike the earlier version, keeps the actual content
-// of a ticket listing (venue/location, every market's price, not just
-// the cheapest one) by scaling everything down rather than cutting it.
-// Layout mirrors EventCard: badge/title/venue up top, a price-row footer
-// below, "Best price" highlighted the same way — just much smaller type
-// and tighter spacing so it fits in a third of the vertical space.
+// 180px tall) and same content set as EventCard (badge, title,
+// venue/location, every market's price with "Best price" highlighting) —
+// just scaled down to fit. Purple fills the outer container; a white box
+// holds all the text/CTA content immediately below the title/venue (not
+// pinned to the bottom), so any leftover space (events with fewer
+// markets) reads as intentional purple framing rather than a dead gap.
 function TicketCTATile({ event }: { event: Event }) {
   const priceValues = event.markets.map((m) => m.minPrice).filter((p) => p > 0)
   const lowestPrice = priceValues.length > 0 ? Math.min(...priceValues) : null
@@ -93,40 +93,38 @@ function TicketCTATile({ event }: { event: Event }) {
   const badgeStyle = SPORT_STYLES[event.sport] ?? 'bg-gray-100 text-gray-600'
 
   return (
-    <div
-      className="col-span-1 row-span-1 rounded-xl bg-white flex flex-col overflow-hidden"
-      style={{ boxShadow: '0 0 0 2px #9966CB' }}
-    >
-      <div className="flex-1 flex flex-col justify-center px-2 py-1 min-h-0">
+    <div className="col-span-1 row-span-1 rounded-xl bg-[#9966CB] p-1.5 flex flex-col">
+      <div className="bg-white rounded-lg px-2 py-1.5">
         <span className={`inline-block text-[8px] font-bold px-1.5 py-0.5 rounded-full leading-none w-fit ${badgeStyle}`}>
           {event.sport}
         </span>
         <h3 className="mt-1 text-[11px] font-bold text-gray-900 leading-tight truncate">{event.title}</h3>
         <p className="text-[9px] text-gray-500 truncate">{event.venue} · {event.city}, {event.state}</p>
-      </div>
-      <div className="border-t border-gray-100 px-1.5 py-1 bg-gray-50 flex flex-col gap-0.5">
-        {event.markets.slice(0, 4).map((m) => {
-          const hasPrice = m.minPrice > 0
-          const isBest = hasComparablePrices && hasPrice && m.minPrice === lowestPrice
-          return (
-            <a
-              key={m.market}
-              href={m.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={`flex items-center justify-between gap-1 px-1.5 py-0.5 rounded-md text-[9px] leading-tight hover:opacity-75 ${
-                isBest ? 'bg-emerald-50' : 'bg-white'
-              }`}
-            >
-              <span className={`font-bold truncate ${MARKET_TEXT[m.market] ?? 'text-gray-600'}`}>
-                {m.market}
-              </span>
-              <span className={`font-bold shrink-0 ${isBest ? 'text-emerald-700' : 'text-gray-700'}`}>
-                {hasPrice ? `$${m.minPrice}` : 'See tix'}
-              </span>
-            </a>
-          )
-        })}
+
+        <div className="mt-1 flex flex-col gap-0.5">
+          {event.markets.slice(0, 4).map((m) => {
+            const hasPrice = m.minPrice > 0
+            const isBest = hasComparablePrices && hasPrice && m.minPrice === lowestPrice
+            return (
+              <a
+                key={m.market}
+                href={m.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`flex items-center justify-between gap-1 px-1.5 py-0.5 rounded-md text-[9px] leading-tight hover:opacity-75 ${
+                  isBest ? 'bg-emerald-50' : 'bg-gray-50'
+                }`}
+              >
+                <span className={`font-bold truncate ${MARKET_TEXT[m.market] ?? 'text-gray-600'}`}>
+                  {m.market}
+                </span>
+                <span className={`font-bold shrink-0 ${isBest ? 'text-emerald-700' : 'text-gray-700'}`}>
+                  {hasPrice ? `$${m.minPrice}` : 'Tickets'}
+                </span>
+              </a>
+            )
+          })}
+        </div>
       </div>
     </div>
   )
