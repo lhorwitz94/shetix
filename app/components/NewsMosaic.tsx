@@ -5,6 +5,7 @@ import Link from 'next/link'
 import type { NewsItem } from '@/lib/news'
 import type { Event, Sport } from '@/lib/types'
 import { SPORTS } from '@/lib/data'
+import EventCard from './EventCard'
 
 type Tile = { kind: 'news'; item: NewsItem; big: boolean } | { kind: 'cta'; event: Event }
 
@@ -44,45 +45,19 @@ function buildTiles(items: NewsItem[], events: Event[]): Tile[] {
   return tiles
 }
 
-function formatShortDate(dateStr: string) {
-  return new Date(dateStr + 'T00:00:00').toLocaleDateString('en-US', {
-    weekday: 'short',
-    month: 'short',
-    day: 'numeric',
-  })
-}
-
+// Reuses EventCard exactly as it appears on the homepage/calendar — no
+// visual changes of its own, just given enough grid room (2 cols wide,
+// 2 rows tall) so its natural content (badge, title, venue, and a price
+// row per market) never gets clipped. `[&>div]:h-full` stretches
+// EventCard's own root <div> to fill that height — since EventCard is
+// already `flex flex-col` with a `flex-1` content section internally,
+// this makes its price-row footer sit flush at the bottom instead of
+// leaving dead space below a short card, without editing EventCard.tsx.
 function TicketCTATile({ event }: { event: Event }) {
-  const priceValues = event.markets.map((m) => m.minPrice).filter((p) => p > 0)
-  const lowestPrice = priceValues.length > 0 ? Math.min(...priceValues) : null
-  const bestMarket = lowestPrice != null
-    ? event.markets.find((m) => m.minPrice === lowestPrice)
-    : event.markets[0]
-
   return (
-    <a
-      href={bestMarket?.url ?? '/'}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="relative col-span-1 row-span-1 overflow-hidden rounded-xl flex flex-col justify-between p-3 text-white hover:opacity-90 transition-opacity"
-      style={{ background: 'linear-gradient(135deg, #7d3fc4 0%, #9966CB 60%, #b57de0 100%)' }}
-    >
-      <div className="flex items-center gap-1">
-        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="shrink-0">
-          <path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2z" />
-        </svg>
-        <span className="text-[9px] font-bold uppercase tracking-wide">{event.sport} Tickets</span>
-      </div>
-      <div>
-        <h3 className="text-xs font-bold leading-tight line-clamp-2">{event.title}</h3>
-        <div className="flex items-center justify-between mt-1.5">
-          <span className="text-[9px] text-white/70">{formatShortDate(event.date)}</span>
-          <span className="text-[11px] font-bold whitespace-nowrap">
-            {lowestPrice ? `$${lowestPrice}+` : 'See tix'}
-          </span>
-        </div>
-      </div>
-    </a>
+    <div className="col-span-2 row-span-2 [&>div]:h-full">
+      <EventCard event={event} />
+    </div>
   )
 }
 
