@@ -1,23 +1,38 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import Link from 'next/link'
 import type { NewsItem } from '@/lib/news'
 
 export default function NewsMosaic() {
   const [items, setItems] = useState<NewsItem[]>([])
+  const [loaded, setLoaded] = useState(false)
 
   useEffect(() => {
     fetch('/api/news')
       .then((r) => r.json())
       .then(setItems)
       .catch(() => setItems([]))
+      .finally(() => setLoaded(true))
   }, [])
 
-  if (items.length === 0) return null
-
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
-      <h2 className="text-xl font-bold text-gray-900 mb-4">Women&apos;s Sports News</h2>
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="mb-4">
+        <Link href="/" className="text-sm font-medium text-gray-400 hover:text-gray-700 flex items-center gap-1 transition-colors w-fit">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+          </svg>
+          See all ticket listings
+        </Link>
+      </div>
+
+      <h1 className="text-xl font-bold text-gray-900 mb-4">Women&apos;s Sports News</h1>
+
+      {loaded && items.length === 0 && (
+        <p className="text-sm text-gray-400 py-12 text-center">No news available right now — check back soon.</p>
+      )}
+
       <div className="grid grid-cols-2 md:grid-cols-4 auto-rows-[180px] gap-3">
         {items.map((item, i) => {
           const big = i % 7 === 0

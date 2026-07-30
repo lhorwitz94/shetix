@@ -67,12 +67,32 @@ function tagLeague(text: string): NewsItem['league'] {
 
 // ── Image extraction ─────────────────────────────────────────────────────────
 
+// Normalizes a raw <img src>/enclosure/media URL into something safe to
+// hotlink from wtix's own domain. Handles two cases beyond plain absolute
+// URLs: protocol-relative ("//host/path") and Gatsby's remote-file proxy
+// path (e.g. The GIST: "/_gatsby/file/<hash>/name.jpg?u=<encoded-original>"),
+// which is relative to the source site and 404s if rendered as-is — the
+// `u` param holds the real, publicly hosted original image URL.
+function resolveImageUrl(rawSrc: string | undefined | null): string | null {
+  if (!rawSrc) return null
+  if (rawSrc.startsWith('http://') || rawSrc.startsWith('https://')) return rawSrc
+  if (rawSrc.startsWith('//')) return `https:${rawSrc}`
+
+  try {
+    const original = new URL(rawSrc, 'https://placeholder.invalid').searchParams.get('u')
+    if (original) return original
+  } catch {
+    // not a parseable relative URL — fall through to null
+  }
+
+  return null
+}
+
 function extractImage(item: ParsedItem): string | null {
-  return (
+  return resolveImageUrl(
     item.media?.$?.url ||
-    item.enclosure?.url ||
-    item['content:encoded']?.match(/<img[^>]+src="([^">]+)"/)?.[1] ||
-    null
+      item.enclosure?.url ||
+      item['content:encoded']?.match(/<img[^>]+src="([^">]+)"/)?.[1],
   )
 }
 

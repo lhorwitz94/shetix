@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import GetTicketAlertsButton from './GetTicketAlertsButton'
 
 const W_TEXTURE = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='44'%3E%3Cpath d='M0 0 L20 34 L40 14 L60 34 L80 0' stroke='%239966CB' stroke-width='1.5' fill='none' opacity='0.15'/%3E%3C/svg%3E")`
@@ -56,7 +57,33 @@ export default function Header() {
         </button>
 
         {/* Right side */}
-        <GetTicketAlertsButton />
+        <div className="flex items-center gap-2">
+          <Link
+            href="/news"
+            style={{
+              background: 'rgba(255,255,255,0.07)',
+              border: '1px solid rgba(153,102,203,0.55)',
+              borderRadius: '999px',
+              padding: '0.45rem 1.1rem',
+              whiteSpace: 'nowrap',
+              fontSize: '0.82rem',
+              fontWeight: 700,
+              color: 'rgba(255,255,255,0.85)',
+              transition: 'border-color 0.15s, background 0.15s',
+            }}
+            onMouseEnter={e => {
+              e.currentTarget.style.background = 'rgba(153,102,203,0.18)'
+              e.currentTarget.style.borderColor = 'rgba(153,102,203,0.9)'
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.background = 'rgba(255,255,255,0.07)'
+              e.currentTarget.style.borderColor = 'rgba(153,102,203,0.55)'
+            }}
+          >
+            News
+          </Link>
+          <GetTicketAlertsButton />
+        </div>
       </div>
     </header>
   )
