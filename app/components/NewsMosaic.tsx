@@ -5,7 +5,18 @@ import Link from 'next/link'
 import type { NewsItem } from '@/lib/news'
 import type { Event, Sport } from '@/lib/types'
 import { SPORTS } from '@/lib/data'
-import EventCard from './EventCard'
+
+// Same sport → badge color mapping as EventCard.tsx, duplicated locally
+// (kept small and self-contained rather than exporting it out of EventCard)
+// so the ticket-CTA tile's badge matches the homepage's exactly.
+const SPORT_STYLES: Record<string, string> = {
+  WNBA: 'bg-orange-100 text-orange-700',
+  NWSL: 'bg-emerald-100 text-emerald-700',
+  PWHL: 'bg-cyan-100 text-cyan-700',
+  Tennis: 'bg-lime-100 text-lime-700',
+  Golf: 'bg-green-100 text-green-700',
+  College: 'bg-blue-100 text-blue-700',
+}
 
 type Tile = { kind: 'news'; item: NewsItem; big: boolean } | { kind: 'cta'; event: Event }
 
@@ -59,25 +70,41 @@ function buildTiles(items: NewsItem[], events: Event[]): Tile[] {
   return tiles
 }
 
-// Reuses EventCard exactly as it appears on the homepage/calendar — no
-// visual changes of its own. Sized to a single mosaic column (matching
-// the footprint of a regular small tile, not a "big" one) with enough
-// row-span for its content (badge, title, venue, price rows) to never
-// get clipped. `[&>div]:h-full` stretches EventCard's own root <div> to
-// fill that height — since EventCard is already `flex flex-col` with a
-// `flex-1` content section internally, this makes its price-row footer
-// sit flush at the bottom instead of leaving dead space below a short
-// card, without editing EventCard.tsx. The purple ring sits on this
-// wrapper (not overriding EventCard's own border) so it frames the card
-// without fighting its existing gray border for specificity.
+// A full EventCard genuinely doesn't fit in a small (1x1, 180px-tall)
+// mosaic tile without clipping its price rows — measured and confirmed,
+// not assumed. So this is a condensed card sized exactly like a regular
+// small news tile: same white background, same sport-badge colors as
+// EventCard, purple border, but a single best-price line instead of a
+// full per-market breakdown.
 function TicketCTATile({ event }: { event: Event }) {
+  const priceValues = event.markets.map((m) => m.minPrice).filter((p) => p > 0)
+  const lowestPrice = priceValues.length > 0 ? Math.min(...priceValues) : null
+  const bestMarket = lowestPrice != null
+    ? event.markets.find((m) => m.minPrice === lowestPrice)
+    : event.markets[0]
+  const badgeStyle = SPORT_STYLES[event.sport] ?? 'bg-gray-100 text-gray-600'
+
   return (
-    <div
-      className="col-span-1 row-span-3 rounded-2xl [&>div]:h-full"
+    <a
+      href={bestMarket?.url ?? '/'}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="col-span-1 row-span-1 rounded-xl bg-white p-3 flex flex-col justify-between hover:shadow-md transition-shadow"
       style={{ boxShadow: '0 0 0 2px #9966CB' }}
     >
-      <EventCard event={event} />
-    </div>
+      <div>
+        <span className={`text-[9px] font-semibold px-2 py-0.5 rounded-full ${badgeStyle}`}>
+          {event.sport}
+        </span>
+        <h3 className="mt-1.5 text-xs font-bold text-gray-900 leading-tight line-clamp-2">{event.title}</h3>
+      </div>
+      <div className="flex items-center justify-between">
+        <span className="text-[9px] font-semibold text-gray-400 uppercase tracking-wide">Tickets</span>
+        <span className="text-xs font-bold text-[#9966CB]">
+          {lowestPrice ? `$${lowestPrice}+` : 'See tix'}
+        </span>
+      </div>
+    </a>
   )
 }
 
