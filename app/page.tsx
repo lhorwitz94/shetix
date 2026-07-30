@@ -1,6 +1,7 @@
 import { Suspense } from 'react'
 import EventsFetcher from './components/EventsFetcher'
 import EventsSkeleton from './components/EventsSkeleton'
+import NewsMosaic from './components/NewsMosaic'
 
 // Force this page to SSR on every request so event listings are always fresh
 export const dynamic = 'force-dynamic'
@@ -26,6 +27,8 @@ export default function Home() {
           </p>
         </div>
       </div>
+
+      <NewsMosaic />
 
       <Suspense fallback={<EventsSkeleton />}>
         <EventsFetcher />
