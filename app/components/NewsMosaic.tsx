@@ -64,20 +64,23 @@ function TicketCTATile({ event }: { event: Event }) {
       href={bestMarket?.url ?? '/'}
       target="_blank"
       rel="noopener noreferrer"
-      className="relative col-span-2 row-span-2 rounded-xl border border-[#e4d4f7] bg-white p-4 flex flex-col justify-between hover:border-[#9966CB] hover:shadow-md transition-all"
+      className="relative col-span-1 row-span-1 overflow-hidden rounded-xl flex flex-col justify-between p-3 text-white hover:opacity-90 transition-opacity"
+      style={{ background: 'linear-gradient(135deg, #7d3fc4 0%, #9966CB 60%, #b57de0 100%)' }}
     >
-      <div>
-        <span className="text-[10px] font-bold uppercase tracking-wide text-[#9966CB] bg-[#f3e8ff] rounded-full px-2 py-0.5">
-          {event.sport} · Tickets
-        </span>
-        <h3 className="mt-2 font-bold text-gray-900 text-sm leading-snug">{event.title}</h3>
-        <p className="mt-1 text-xs text-gray-500">{event.venue} · {event.city}, {event.state}</p>
+      <div className="flex items-center gap-1">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="shrink-0">
+          <path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2z" />
+        </svg>
+        <span className="text-[9px] font-bold uppercase tracking-wide">{event.sport} Tickets</span>
       </div>
-      <div className="flex items-center justify-between mt-3">
-        <span className="text-xs font-semibold text-gray-400">{formatShortDate(event.date)}</span>
-        <span className="text-sm font-bold text-[#9966CB]">
-          {lowestPrice ? `From $${lowestPrice}` : 'See tickets'} →
-        </span>
+      <div>
+        <h3 className="text-xs font-bold leading-tight line-clamp-2">{event.title}</h3>
+        <div className="flex items-center justify-between mt-1.5">
+          <span className="text-[9px] text-white/70">{formatShortDate(event.date)}</span>
+          <span className="text-[11px] font-bold whitespace-nowrap">
+            {lowestPrice ? `$${lowestPrice}+` : 'See tix'}
+          </span>
+        </div>
       </div>
     </a>
   )
