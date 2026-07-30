@@ -80,13 +80,16 @@ function buildTiles(items: NewsItem[], events: Event[]): Tile[] {
 }
 
 // Same footprint as a regular small news tile (col-span-1 row-span-1,
-// 180px tall) and same content set as EventCard (badge, title,
-// venue/location, every market's price with "Best price" highlighting) —
-// just scaled down to fit. Outer container uses the same dark gradient as
-// the hero/header (Header.tsx, app/page.tsx) rather than the flat brand
-// accent, and is vertically centered (`justify-center`) so leftover
-// space for events with fewer markets is split above/below the white
-// box instead of collecting entirely at the bottom.
+// 180px tall) and same content set as EventCard (title, venue/location,
+// every market's price with "Best price" highlighting) — just scaled
+// down to fit. Outer container uses the same dark gradient as the
+// hero/header (Header.tsx, app/page.tsx), is vertically centered
+// (`justify-center`) so leftover space for events with fewer markets
+// splits above/below the white box, and carries the sport badge itself
+// (with a ticket icon) absolutely positioned in the top-left corner —
+// outside the white box, on the dark background — so it reads as "this
+// is a ticket promo for [sport]" at a glance rather than blending into
+// the card's own content.
 function TicketCTATile({ event }: { event: Event }) {
   const priceValues = event.markets.map((m) => m.minPrice).filter((p) => p > 0)
   const lowestPrice = priceValues.length > 0 ? Math.min(...priceValues) : null
@@ -95,14 +98,18 @@ function TicketCTATile({ event }: { event: Event }) {
 
   return (
     <div
-      className="col-span-1 row-span-1 rounded-xl p-1.5 flex flex-col justify-center"
+      className="relative col-span-1 row-span-1 rounded-xl p-1.5 flex flex-col justify-center"
       style={{ background: 'linear-gradient(135deg, #060011 0%, #1a0638 45%, #2a0a50 55%, #060011 100%)' }}
     >
+      <span className={`absolute top-1.5 left-1.5 inline-flex items-center gap-0.5 text-[8px] font-bold px-1.5 py-0.5 rounded-full leading-none ${badgeStyle}`}>
+        <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2z" />
+        </svg>
+        {event.sport}
+      </span>
+
       <div className="bg-white rounded-lg px-2 py-1.5">
-        <span className={`inline-block text-[8px] font-bold px-1.5 py-0.5 rounded-full leading-none w-fit ${badgeStyle}`}>
-          {event.sport}
-        </span>
-        <h3 className="mt-1 text-[11px] font-bold text-gray-900 leading-tight truncate">{event.title}</h3>
+        <h3 className="text-[11px] font-bold text-gray-900 leading-tight truncate">{event.title}</h3>
         <p className="text-[9px] text-gray-500 truncate">{event.venue} · {event.city}, {event.state}</p>
 
         <div className="mt-1 flex flex-col gap-0.5">
