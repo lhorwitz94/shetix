@@ -142,14 +142,23 @@ function TicketCTATile({ event }: { event: Event }) {
 }
 
 function NewsTile({ item, big }: { item: NewsItem; big: boolean }) {
+  const isVideo = item.contentType === 'video'
+  // Videos always get a wide horizontal widget shape (2 cols x 1 row) so
+  // they stand out from the square/tall article tiles, regardless of the
+  // "big every 7th" alternation those use — not chosen per-video based on
+  // the source video's real aspect ratio. YouTube's public feed always
+  // reports thumbnails as a fixed 480x360 container regardless of the
+  // actual video's orientation (verified against real feed data — every
+  // entry across every channel reports identical dimensions), so detecting
+  // vertical vs. horizontal per video isn't reliable from feed data alone.
+  const sizeClass = isVideo ? 'col-span-2 row-span-1' : big ? 'col-span-2 row-span-2' : 'col-span-1 row-span-1'
+
   return (
     <a
       href={item.link}
       target="_blank"
       rel="noopener noreferrer"
-      className={`relative group overflow-hidden rounded-xl bg-neutral-900 ${
-        big ? 'col-span-2 row-span-2' : 'col-span-1 row-span-1'
-      }`}
+      className={`relative group overflow-hidden rounded-xl bg-neutral-900 ${sizeClass}`}
     >
       {item.image ? (
         // eslint-disable-next-line @next/next/no-img-element
@@ -165,11 +174,13 @@ function NewsTile({ item, big }: { item: NewsItem; big: boolean }) {
         <div className="absolute inset-0 bg-gradient-to-br from-[#4a2a70] to-[#1a0638]" />
       )}
       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-      {item.contentType === 'video' && (
-        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-          <svg width={big ? 40 : 28} height={big ? 40 : 28} viewBox="0 0 24 24" fill="white" className="drop-shadow-lg">
-            <path d="M8 5v14l11-7z" />
-          </svg>
+      {isVideo && (
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="w-9 h-9 rounded-full bg-black/50 flex items-center justify-center group-hover:bg-black/70 group-hover:scale-110 transition-all">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="white" className="ml-0.5">
+              <path d="M8 5v14l11-7z" />
+            </svg>
+          </div>
         </div>
       )}
       <div className="absolute bottom-0 p-3 text-white">
