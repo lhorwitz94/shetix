@@ -10,6 +10,7 @@ export interface NewsItem {
   image: string | null
   excerpt: string
   publishedAt: string
+  contentType: 'article' | 'video'
 }
 
 interface RSSItemExtensions {
@@ -181,6 +182,7 @@ async function fetchSource(source: { name: string; url: string }): Promise<NewsI
       image: extractImage(item, link),
       league: tagLeague(`${title} ${excerpt}`),
       excerpt,
+      contentType: 'article' as const,
     }
   })
 

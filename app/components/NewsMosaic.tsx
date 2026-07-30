@@ -165,6 +165,13 @@ function NewsTile({ item, big }: { item: NewsItem; big: boolean }) {
         <div className="absolute inset-0 bg-gradient-to-br from-[#4a2a70] to-[#1a0638]" />
       )}
       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+      {item.contentType === 'video' && (
+        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+          <svg width={big ? 40 : 28} height={big ? 40 : 28} viewBox="0 0 24 24" fill="white" className="drop-shadow-lg">
+            <path d="M8 5v14l11-7z" />
+          </svg>
+        </div>
+      )}
       <div className="absolute bottom-0 p-3 text-white">
         <span className="text-[10px] uppercase tracking-wide bg-white/20 rounded px-1.5 py-0.5">
           {item.league}
