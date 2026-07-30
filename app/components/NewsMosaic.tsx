@@ -186,7 +186,7 @@ export default function NewsMosaic({ events }: { events: Event[] }) {
         <p className="text-sm text-gray-400 py-12 text-center">No {activeSport} news right now — try a different sport.</p>
       )}
 
-      <div className="grid grid-cols-2 md:grid-cols-4 auto-rows-[180px] gap-3">
+      <div className="grid grid-flow-dense grid-cols-2 md:grid-cols-4 auto-rows-[180px] gap-3">
         {tiles.map((tile) =>
           tile.kind === 'news' ? (
             <NewsTile key={tile.item.id} item={tile.item} big={tile.big} />
