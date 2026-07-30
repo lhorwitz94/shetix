@@ -11,6 +11,20 @@ type Tile = { kind: 'news'; item: NewsItem; big: boolean } | { kind: 'cta'; even
 
 const CTA_EVERY = 7
 
+const SORT_OPTIONS = ['Most Recent', 'Alphabetical', 'By League'] as const
+type SortOption = (typeof SORT_OPTIONS)[number]
+
+function sortItems(items: NewsItem[], sort: SortOption): NewsItem[] {
+  const out = [...items]
+  if (sort === 'Alphabetical') {
+    out.sort((a, b) => a.title.localeCompare(b.title))
+  } else if (sort === 'By League') {
+    out.sort((a, b) => a.league.localeCompare(b.league) || b.publishedAt.localeCompare(a.publishedAt))
+  }
+  // 'Most Recent' — items already arrive sorted by publishedAt desc from the API
+  return out
+}
+
 function buildTiles(items: NewsItem[], events: Event[]): Tile[] {
   const tiles: Tile[] = []
   const usedEventIds = new Set<string>()
@@ -46,16 +60,22 @@ function buildTiles(items: NewsItem[], events: Event[]): Tile[] {
 }
 
 // Reuses EventCard exactly as it appears on the homepage/calendar — no
-// visual changes of its own, just given enough grid room (2 cols wide,
-// 2 rows tall) so its natural content (badge, title, venue, and a price
-// row per market) never gets clipped. `[&>div]:h-full` stretches
-// EventCard's own root <div> to fill that height — since EventCard is
-// already `flex flex-col` with a `flex-1` content section internally,
-// this makes its price-row footer sit flush at the bottom instead of
-// leaving dead space below a short card, without editing EventCard.tsx.
+// visual changes of its own. Sized to a single mosaic column (matching
+// the footprint of a regular small tile, not a "big" one) with enough
+// row-span for its content (badge, title, venue, price rows) to never
+// get clipped. `[&>div]:h-full` stretches EventCard's own root <div> to
+// fill that height — since EventCard is already `flex flex-col` with a
+// `flex-1` content section internally, this makes its price-row footer
+// sit flush at the bottom instead of leaving dead space below a short
+// card, without editing EventCard.tsx. The purple ring sits on this
+// wrapper (not overriding EventCard's own border) so it frames the card
+// without fighting its existing gray border for specificity.
 function TicketCTATile({ event }: { event: Event }) {
   return (
-    <div className="col-span-2 row-span-2 [&>div]:h-full">
+    <div
+      className="col-span-1 row-span-3 rounded-2xl [&>div]:h-full"
+      style={{ boxShadow: '0 0 0 2px #9966CB' }}
+    >
       <EventCard event={event} />
     </div>
   )
@@ -102,6 +122,7 @@ export default function NewsMosaic({ events }: { events: Event[] }) {
   const [items, setItems] = useState<NewsItem[]>([])
   const [loaded, setLoaded] = useState(false)
   const [activeSport, setActiveSport] = useState<Sport | 'All'>('All')
+  const [sort, setSort] = useState<SortOption>('Most Recent')
 
   useEffect(() => {
     fetch('/api/news')
@@ -115,13 +136,14 @@ export default function NewsMosaic({ events }: { events: Event[] }) {
     () => (activeSport === 'All' ? items : items.filter((i) => i.league === activeSport)),
     [items, activeSport],
   )
+  const sortedItems = useMemo(() => sortItems(filteredItems, sort), [filteredItems, sort])
   const filteredEvents = useMemo(
     () => (activeSport === 'All' ? events : events.filter((e) => e.sport === activeSport)),
     [events, activeSport],
   )
   const tiles = useMemo(
-    () => buildTiles(filteredItems, filteredEvents),
-    [filteredItems, filteredEvents],
+    () => buildTiles(sortedItems, filteredEvents),
+    [sortedItems, filteredEvents],
   )
 
   return (
@@ -137,21 +159,33 @@ export default function NewsMosaic({ events }: { events: Event[] }) {
 
       <h1 className="text-xl font-bold text-gray-900 mb-4">Women&apos;s Sports News</h1>
 
-      {/* Sport filter pills */}
-      <div className="flex items-center gap-2 flex-wrap mb-6">
-        {(['All', ...SPORTS] as const).map((sport) => (
-          <button
-            key={sport}
-            onClick={() => setActiveSport(sport)}
-            className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all whitespace-nowrap flex-shrink-0 ${
-              activeSport === sport
-                ? 'bg-[#9966CB] text-white shadow-sm'
-                : 'bg-white border border-gray-200 text-gray-600 hover:border-[#c4a0e0] hover:text-[#9966CB]'
-            }`}
-          >
-            {sport}
-          </button>
-        ))}
+      {/* Sort + sport filter pills */}
+      <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-6">
+        <select
+          value={sort}
+          onChange={(e) => setSort(e.target.value as SortOption)}
+          className="sm:w-52 px-3 py-2.5 rounded-xl border border-gray-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#9966CB] cursor-pointer"
+        >
+          {SORT_OPTIONS.map((o) => (
+            <option key={o}>{o}</option>
+          ))}
+        </select>
+
+        <div className="flex items-center gap-2 flex-wrap">
+          {(['All', ...SPORTS] as const).map((sport) => (
+            <button
+              key={sport}
+              onClick={() => setActiveSport(sport)}
+              className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all whitespace-nowrap flex-shrink-0 ${
+                activeSport === sport
+                  ? 'bg-[#9966CB] text-white shadow-sm'
+                  : 'bg-white border border-gray-200 text-gray-600 hover:border-[#c4a0e0] hover:text-[#9966CB]'
+              }`}
+            >
+              {sport}
+            </button>
+          ))}
+        </div>
       </div>
 
       {loaded && items.length === 0 && (
