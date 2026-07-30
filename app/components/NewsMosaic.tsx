@@ -82,10 +82,11 @@ function buildTiles(items: NewsItem[], events: Event[]): Tile[] {
 // Same footprint as a regular small news tile (col-span-1 row-span-1,
 // 180px tall) and same content set as EventCard (badge, title,
 // venue/location, every market's price with "Best price" highlighting) —
-// just scaled down to fit. Purple fills the outer container; a white box
-// holds all the text/CTA content immediately below the title/venue (not
-// pinned to the bottom), so any leftover space (events with fewer
-// markets) reads as intentional purple framing rather than a dead gap.
+// just scaled down to fit. Outer container uses the same dark gradient as
+// the hero/header (Header.tsx, app/page.tsx) rather than the flat brand
+// accent, and is vertically centered (`justify-center`) so leftover
+// space for events with fewer markets is split above/below the white
+// box instead of collecting entirely at the bottom.
 function TicketCTATile({ event }: { event: Event }) {
   const priceValues = event.markets.map((m) => m.minPrice).filter((p) => p > 0)
   const lowestPrice = priceValues.length > 0 ? Math.min(...priceValues) : null
@@ -93,7 +94,10 @@ function TicketCTATile({ event }: { event: Event }) {
   const badgeStyle = SPORT_STYLES[event.sport] ?? 'bg-gray-100 text-gray-600'
 
   return (
-    <div className="col-span-1 row-span-1 rounded-xl bg-[#9966CB] p-1.5 flex flex-col">
+    <div
+      className="col-span-1 row-span-1 rounded-xl p-1.5 flex flex-col justify-center"
+      style={{ background: 'linear-gradient(135deg, #060011 0%, #1a0638 45%, #2a0a50 55%, #060011 100%)' }}
+    >
       <div className="bg-white rounded-lg px-2 py-1.5">
         <span className={`inline-block text-[8px] font-bold px-1.5 py-0.5 rounded-full leading-none w-fit ${badgeStyle}`}>
           {event.sport}
