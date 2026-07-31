@@ -5,6 +5,7 @@ import Link from 'next/link'
 import type { NewsItem } from '@/lib/news'
 import type { Event, Sport } from '@/lib/types'
 import { SPORTS } from '@/lib/data'
+import PreviewModal from './PreviewModal'
 
 // Same sport → badge color mapping as EventCard.tsx, duplicated locally
 // (kept small and self-contained rather than exporting it out of EventCard)
@@ -141,7 +142,7 @@ function TicketCTATile({ event }: { event: Event }) {
   )
 }
 
-function NewsTile({ item, big }: { item: NewsItem; big: boolean }) {
+function NewsTile({ item, big, onOpen }: { item: NewsItem; big: boolean; onOpen: () => void }) {
   const isVideo = item.contentType === 'video'
   // Videos get a tall vertical widget shape so they stand out from the
   // square/wide article tiles, regardless of the "big every 7th"
@@ -166,11 +167,10 @@ function NewsTile({ item, big }: { item: NewsItem; big: boolean }) {
     : big ? 'col-span-2 row-span-2' : 'col-span-1 row-span-1'
 
   return (
-    <a
-      href={item.link}
-      target="_blank"
-      rel="noopener noreferrer"
-      className={`relative group overflow-hidden rounded-xl bg-neutral-900 ${sizeClass}`}
+    <button
+      type="button"
+      onClick={onOpen}
+      className={`relative group overflow-hidden rounded-xl bg-neutral-900 w-full h-full text-left ${sizeClass}`}
     >
       {item.image ? (
         // eslint-disable-next-line @next/next/no-img-element
@@ -204,7 +204,7 @@ function NewsTile({ item, big }: { item: NewsItem; big: boolean }) {
         </h3>
         <span className="text-[10px] text-white/60">{item.source}</span>
       </div>
-    </a>
+    </button>
   )
 }
 
@@ -213,6 +213,7 @@ export default function NewsMosaic({ events }: { events: Event[] }) {
   const [loaded, setLoaded] = useState(false)
   const [activeSport, setActiveSport] = useState<Sport | 'All'>('All')
   const [sort, setSort] = useState<SortOption>('Most Recent')
+  const [previewItem, setPreviewItem] = useState<NewsItem | null>(null)
 
   useEffect(() => {
     fetch('/api/news')
@@ -288,12 +289,19 @@ export default function NewsMosaic({ events }: { events: Event[] }) {
       <div className="grid grid-flow-dense grid-cols-2 md:grid-cols-4 auto-rows-[180px] gap-3">
         {tiles.map((tile) =>
           tile.kind === 'news' ? (
-            <NewsTile key={tile.item.id} item={tile.item} big={tile.big} />
+            <NewsTile
+              key={tile.item.id}
+              item={tile.item}
+              big={tile.big}
+              onOpen={() => setPreviewItem(tile.item)}
+            />
           ) : (
             <TicketCTATile key={`cta-${tile.event.id}`} event={tile.event} />
           ),
         )}
       </div>
+
+      <PreviewModal item={previewItem} onClose={() => setPreviewItem(null)} />
     </div>
   )
 }
