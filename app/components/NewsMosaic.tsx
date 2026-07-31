@@ -79,15 +79,17 @@ function buildTiles(items: NewsItem[], events: Event[]): Tile[] {
   return tiles
 }
 
-// A deliberately unique shape so this doesn't blend in with either the
-// square/wide article tiles or the tall vertical video tiles: col-span-2
-// row-span-3 is ~602x564, close to a true square — the largest, most
-// distinct tile in the mosaic. Styling is a white card (dominant, not a
-// small box floating in a sea of color) with a purple ring border, per
-// explicit direction — not the dark-hero-gradient-background version
-// this went through earlier. With this much more room than the old
-// col-span-1 row-span-1 version, content doesn't need to be crushed down
-// to 8-9px text anymore — sized closer to EventCard's own proportions.
+// Same footprint as a regular small tile (col-span-1 row-span-1,
+// ~295x180 — a quarter the area of the earlier col-span-2 row-span-3
+// version, per explicit "way too big" feedback). The outer frame reuses
+// the exact hero/header background (W_TEXTURE zigzag + dark gradient —
+// same literal values as Header.tsx/app/page.tsx) rather than a flat
+// purple, with generous padding (p-3) so that frame reads as a thick
+// border, not a thin sliver. A white box sits centered in the middle of
+// that frame holding all the actual content (badge, title, venue, price
+// rows) — small again, so back to compact type sizes.
+const W_TEXTURE = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='44'%3E%3Cpath d='M0 0 L20 34 L40 14 L60 34 L80 0' stroke='%239966CB' stroke-width='1.5' fill='none' opacity='0.15'/%3E%3C/svg%3E")`
+
 function TicketCTATile({ event }: { event: Event }) {
   const priceValues = event.markets.map((m) => m.minPrice).filter((p) => p > 0)
   const lowestPrice = priceValues.length > 0 ? Math.min(...priceValues) : null
@@ -96,49 +98,44 @@ function TicketCTATile({ event }: { event: Event }) {
 
   return (
     <div
-      className="col-span-2 row-span-3 rounded-2xl bg-white p-4 flex flex-col justify-center"
-      style={{ boxShadow: '0 0 0 3px #9966CB' }}
+      className="col-span-1 row-span-1 rounded-xl p-3 flex flex-col justify-center"
+      style={{ background: `${W_TEXTURE}, linear-gradient(135deg, #060011 0%, #1a0638 45%, #2a0a50 55%, #060011 100%)` }}
     >
-      <div>
-        <span className={`inline-flex items-center gap-1 w-fit text-[11px] font-bold px-2.5 py-1 rounded-full leading-none mb-3 ${badgeStyle}`}>
-          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+      <div className="bg-white rounded-lg px-2 py-1.5 flex flex-col justify-center">
+        <span className={`inline-flex items-center gap-0.5 w-fit text-[8px] font-bold px-1.5 py-0.5 rounded-full leading-none mb-1 ${badgeStyle}`}>
+          <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
             <path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2z" />
           </svg>
           {event.sport} Tickets
         </span>
 
-        <h3 className="text-lg font-bold text-gray-900 leading-snug">{event.title}</h3>
-        <p className="mt-1 text-sm text-gray-500">{event.venue} · {event.city}, {event.state}</p>
-      </div>
+        <h3 className="text-[11px] font-bold text-gray-900 leading-tight truncate">{event.title}</h3>
+        <p className="text-[9px] text-gray-500 truncate">{event.venue} · {event.city}, {event.state}</p>
 
-      <div className="mt-4 flex flex-col gap-1.5">
-        {event.markets.slice(0, 4).map((m) => {
-          const hasPrice = m.minPrice > 0
-          const isBest = hasComparablePrices && hasPrice && m.minPrice === lowestPrice
-          return (
-            <a
-              key={m.market}
-              href={m.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={`flex items-center justify-between gap-2 px-3 py-2 rounded-xl border text-sm transition-opacity hover:opacity-75 ${
-                isBest ? 'bg-emerald-50 border-emerald-200' : 'bg-white border-gray-100'
-              }`}
-            >
-              <span className={`text-xs font-bold ${MARKET_TEXT[m.market] ?? 'text-gray-600'}`}>
-                {m.market}
-              </span>
-              <div className="flex items-center gap-2">
-                {isBest && (
-                  <span className="text-[10px] font-bold text-emerald-600 uppercase tracking-wide">Best price</span>
-                )}
-                <span className={`text-sm font-bold ${isBest ? 'text-emerald-700' : 'text-gray-700'}`}>
+        <div className="mt-1 flex flex-col gap-0.5">
+          {event.markets.slice(0, 4).map((m) => {
+            const hasPrice = m.minPrice > 0
+            const isBest = hasComparablePrices && hasPrice && m.minPrice === lowestPrice
+            return (
+              <a
+                key={m.market}
+                href={m.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`flex items-center justify-between gap-1 px-1.5 py-0.5 rounded-md text-[9px] leading-tight hover:opacity-75 ${
+                  isBest ? 'bg-emerald-50' : 'bg-gray-50'
+                }`}
+              >
+                <span className={`font-bold truncate ${MARKET_TEXT[m.market] ?? 'text-gray-600'}`}>
+                  {m.market}
+                </span>
+                <span className={`font-bold shrink-0 ${isBest ? 'text-emerald-700' : 'text-gray-700'}`}>
                   {hasPrice ? `$${m.minPrice}` : 'Tickets'}
                 </span>
-              </div>
-            </a>
-          )
-        })}
+              </a>
+            )
+          })}
+        </div>
       </div>
     </div>
   )
