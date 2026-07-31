@@ -143,15 +143,18 @@ function TicketCTATile({ event }: { event: Event }) {
 
 function NewsTile({ item, big }: { item: NewsItem; big: boolean }) {
   const isVideo = item.contentType === 'video'
-  // Videos always get a wide horizontal widget shape (2 cols x 1 row) so
-  // they stand out from the square/tall article tiles, regardless of the
-  // "big every 7th" alternation those use — not chosen per-video based on
-  // the source video's real aspect ratio. YouTube's public feed always
-  // reports thumbnails as a fixed 480x360 container regardless of the
-  // actual video's orientation (verified against real feed data — every
-  // entry across every channel reports identical dimensions), so detecting
-  // vertical vs. horizontal per video isn't reliable from feed data alone.
-  const sizeClass = isVideo ? 'col-span-2 row-span-1' : big ? 'col-span-2 row-span-2' : 'col-span-1 row-span-1'
+  // Videos always get a tall vertical widget shape (1 col x 3 rows,
+  // ~295x564 — close to a TikTok/Reels 9:16 portrait ratio) so they stand
+  // out from the square/wide article tiles, regardless of the "big every
+  // 7th" alternation those use — not chosen per-video based on the source
+  // video's real aspect ratio. YouTube's public feed always reports
+  // thumbnails as a fixed 480x360 container regardless of the actual
+  // video's orientation (verified against real feed data — every entry
+  // across every channel reports identical dimensions), so there's no
+  // reliable per-video signal to key off from feed data alone. Same
+  // column width as a regular tile (not wider) so it packs into the
+  // masonry cleanly rather than disrupting the column rhythm.
+  const sizeClass = isVideo ? 'col-span-1 row-span-3' : big ? 'col-span-2 row-span-2' : 'col-span-1 row-span-1'
 
   return (
     <a
