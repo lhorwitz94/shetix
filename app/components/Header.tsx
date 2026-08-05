@@ -21,16 +21,20 @@ export default function Header() {
   const pathname = usePathname()
   const isNewsPage = pathname?.startsWith('/news')
 
-  // /news gets its own hero treatment: solid purple, "The Wyn" centered,
-  // no News/Get Ticket Alerts buttons — this header *is* the page's hero
-  // here, not just a nav bar, per explicit design direction. Every other
-  // route keeps the original wtix hero/nav untouched.
+  // /news gets its own hero treatment: "The Wyn" centered, no News/Get
+  // Ticket Alerts buttons — this header *is* the page's hero here, not
+  // just a nav bar, per explicit design direction. Background is the
+  // exact same W_TEXTURE + dark gradient as the default wtix header
+  // (not a flat/lighter purple — that was a first pass, corrected per
+  // explicit feedback), so the two headers share one visual identity and
+  // only the wordmark + right-side controls differ. Every other route
+  // keeps the original wtix hero/nav untouched.
   if (isNewsPage) {
     return (
       <header
         className="sticky top-0 z-50 flex items-center justify-center"
         style={{
-          background: 'linear-gradient(135deg, #7d3fc4 0%, #9966CB 50%, #b57de0 100%)',
+          background: `${W_TEXTURE}, linear-gradient(135deg, #060011 0%, #1a0638 45%, #2a0a50 55%, #060011 100%)`,
           height: '80px',
         }}
       >
@@ -124,7 +128,7 @@ export default function Header() {
               e.currentTarget.style.borderColor = 'rgba(153,102,203,0.55)'
             }}
           >
-            News
+            The Wyn
           </Link>
           <GetTicketAlertsButton />
         </div>
