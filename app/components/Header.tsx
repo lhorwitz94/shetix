@@ -1,11 +1,55 @@
 'use client'
 
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
+import { Alfa_Slab_One } from 'next/font/google'
 import GetTicketAlertsButton from './GetTicketAlertsButton'
 
 const W_TEXTURE = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='44'%3E%3Cpath d='M0 0 L20 34 L40 14 L60 34 L80 0' stroke='%239966CB' stroke-width='1.5' fill='none' opacity='0.15'/%3E%3C/svg%3E")`
 
+// "The Wyn" (the news/content feed's own brand, distinct from the wtix
+// ticket marketplace it lives inside) uses a bold retro slab-serif rather
+// than wtix's italic shimmer script, so the two logos read as different
+// products sharing one site, not the same wordmark reused twice.
+const retroFont = Alfa_Slab_One({ subsets: ['latin'], weight: '400' })
+
+function scrollToTop() {
+  window.scrollTo({ top: 0, behavior: 'smooth' })
+}
+
 export default function Header() {
+  const pathname = usePathname()
+  const isNewsPage = pathname?.startsWith('/news')
+
+  // /news gets its own hero treatment: solid purple, "The Wyn" centered,
+  // no News/Get Ticket Alerts buttons — this header *is* the page's hero
+  // here, not just a nav bar, per explicit design direction. Every other
+  // route keeps the original wtix hero/nav untouched.
+  if (isNewsPage) {
+    return (
+      <header
+        className="sticky top-0 z-50 flex items-center justify-center"
+        style={{
+          background: 'linear-gradient(135deg, #7d3fc4 0%, #9966CB 50%, #b57de0 100%)',
+          height: '80px',
+        }}
+      >
+        <button
+          onClick={scrollToTop}
+          aria-label="Back to top"
+          className={retroFont.className}
+          style={{
+            background: 'none', border: 'none', padding: 0, cursor: 'pointer',
+            fontSize: '2rem', color: '#fff', letterSpacing: '0.02em',
+            textShadow: '2px 2px 0 rgba(0,0,0,0.18)',
+          }}
+        >
+          The Wyn
+        </button>
+      </header>
+    )
+  }
+
   return (
     <header
       className="sticky top-0 z-50"
@@ -17,7 +61,7 @@ export default function Header() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex items-center justify-between">
         {/* Logo — click scrolls to top */}
         <button
-          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+          onClick={scrollToTop}
           aria-label="Back to top"
           style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}
         >

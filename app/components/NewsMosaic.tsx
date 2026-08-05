@@ -248,10 +248,12 @@ export default function NewsMosaic({ events }: { events: Event[] }) {
         </Link>
       </div>
 
-      <h1 className="text-xl font-bold text-gray-900 mb-4">Women&apos;s Sports News</h1>
+      <h1 className="text-center text-gray-500 text-base sm:text-lg max-w-xl mx-auto mb-6">
+        Your women&apos;s sports feed for content, news, tickets, merch, and more.
+      </h1>
 
-      {/* Sort + sport filter pills */}
-      <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-6">
+      {/* Sort + sport filter pills — centered as one group under the hero */}
+      <div className="flex flex-col items-center sm:flex-row sm:justify-center gap-3 mb-6">
         <select
           value={sort}
           onChange={(e) => setSort(e.target.value as SortOption)}
@@ -262,7 +264,7 @@ export default function NewsMosaic({ events }: { events: Event[] }) {
           ))}
         </select>
 
-        <div className="flex items-center gap-2 flex-wrap">
+        <div className="flex items-center justify-center gap-2 flex-wrap">
           {(['All', ...SPORTS] as const).map((sport) => (
             <button
               key={sport}
