@@ -46,18 +46,20 @@ export default function Header() {
             display: 'flex', alignItems: 'center', justifyContent: 'center',
           }}
         >
-          {/* Badge backdrop — gold ellipse, tilted, thick black outline.
-              Sized generously beyond the wordmark on all sides so it
-              reads as a patch/badge, not a tight bounding box. Kept small
-              enough (with the wordmark below) to fit inside the 80px
-              header without clipping at the top/bottom. */}
+          {/* Badge backdrop — gold ellipse, tilted, thin clean black
+              outline (a thick stroke here read as "crayon-drawn" —
+              corrected per explicit feedback). Sized generously beyond
+              the wordmark on all sides so it reads as a patch/badge, not
+              a tight bounding box. Kept small enough (with the wordmark
+              below) to fit inside the 80px header without clipping at
+              the top/bottom. */}
           <svg
             width="150" height="60" viewBox="0 0 150 60"
             style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}
           >
             <ellipse
               cx="75" cy="30" rx="68" ry="24"
-              fill="#E8A93D" stroke="#000" strokeWidth="6"
+              fill="#E8A93D" stroke="#000" strokeWidth="2"
               transform="rotate(-17 75 30)"
             />
           </svg>
@@ -69,7 +71,7 @@ export default function Header() {
             <span
               style={{
                 fontSize: '0.7rem', color: '#B8A6F0',
-                WebkitTextStroke: '1.5px #000',
+                WebkitTextStroke: '0.6px #000',
                 transform: 'rotate(-10deg)',
                 marginBottom: '-3px',
               }}
@@ -79,8 +81,8 @@ export default function Header() {
             <span
               style={{
                 fontSize: '1.5rem', color: '#B8A6F0',
-                WebkitTextStroke: '3px #000',
-                textShadow: '2px 2px 0 rgba(0,0,0,0.85)',
+                WebkitTextStroke: '1.1px #000',
+                textShadow: '1px 1px 0 rgba(0,0,0,0.85)',
               }}
             >
               Wyn
