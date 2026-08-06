@@ -2,16 +2,15 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Alfa_Slab_One } from 'next/font/google'
+import { Luckiest_Guy } from 'next/font/google'
 import GetTicketAlertsButton from './GetTicketAlertsButton'
 
 const W_TEXTURE = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='44'%3E%3Cpath d='M0 0 L20 34 L40 14 L60 34 L80 0' stroke='%239966CB' stroke-width='1.5' fill='none' opacity='0.15'/%3E%3C/svg%3E")`
 
-// "The Wyn" (the news/content feed's own brand, distinct from the wtix
-// ticket marketplace it lives inside) uses a bold retro slab-serif rather
-// than wtix's italic shimmer script, so the two logos read as different
-// products sharing one site, not the same wordmark reused twice.
-const retroFont = Alfa_Slab_One({ subsets: ['latin'], weight: '400' })
+// "The Wyn" badge logo — chunky comic/patch-style display font (distinct
+// from wtix's italic shimmer script) so the two wordmarks read as
+// different products sharing one site.
+const badgeFont = Luckiest_Guy({ subsets: ['latin'], weight: '400' })
 
 function scrollToTop() {
   window.scrollTo({ top: 0, behavior: 'smooth' })
@@ -41,14 +40,52 @@ export default function Header() {
         <button
           onClick={scrollToTop}
           aria-label="Back to top"
-          className={retroFont.className}
           style={{
-            background: 'none', border: 'none', padding: 0, cursor: 'pointer',
-            fontSize: '2rem', color: '#fff', letterSpacing: '0.02em',
-            textShadow: '2px 2px 0 rgba(0,0,0,0.18)',
+            position: 'relative', background: 'none', border: 'none', padding: 0,
+            cursor: 'pointer', width: 150, height: 60,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
           }}
         >
-          The Wyn
+          {/* Badge backdrop — gold ellipse, tilted, thick black outline.
+              Sized generously beyond the wordmark on all sides so it
+              reads as a patch/badge, not a tight bounding box. Kept small
+              enough (with the wordmark below) to fit inside the 80px
+              header without clipping at the top/bottom. */}
+          <svg
+            width="150" height="60" viewBox="0 0 150 60"
+            style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}
+          >
+            <ellipse
+              cx="75" cy="30" rx="68" ry="24"
+              fill="#E8A93D" stroke="#000" strokeWidth="6"
+              transform="rotate(-17 75 30)"
+            />
+          </svg>
+
+          <div
+            className={badgeFont.className}
+            style={{ position: 'relative', zIndex: 10, display: 'flex', flexDirection: 'column', alignItems: 'center', lineHeight: 1 }}
+          >
+            <span
+              style={{
+                fontSize: '0.7rem', color: '#B8A6F0',
+                WebkitTextStroke: '1.5px #000',
+                transform: 'rotate(-10deg)',
+                marginBottom: '-3px',
+              }}
+            >
+              The
+            </span>
+            <span
+              style={{
+                fontSize: '1.5rem', color: '#B8A6F0',
+                WebkitTextStroke: '3px #000',
+                textShadow: '2px 2px 0 rgba(0,0,0,0.85)',
+              }}
+            >
+              Wyn
+            </span>
+          </div>
         </button>
       </header>
     )
