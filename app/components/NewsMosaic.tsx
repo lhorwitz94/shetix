@@ -105,15 +105,23 @@ function buildTiles(items: NewsItem[], events: Event[]): Tile[] {
   return tiles
 }
 
-// Same footprint as a regular small tile (col-span-1 row-span-1,
-// ~295x180 — a quarter the area of the earlier col-span-2 row-span-3
-// version, per explicit "way too big" feedback). The outer frame reuses
-// the exact hero/header background (W_TEXTURE zigzag + dark gradient —
-// same literal values as Header.tsx/app/page.tsx) rather than a flat
-// purple, with generous padding (p-3) so that frame reads as a thick
-// border, not a thin sliver. A white box sits centered in the middle of
-// that frame holding all the actual content (badge, title, venue, price
-// rows) — small again, so back to compact type sizes.
+// col-span-1 row-span-1 on desktop (~295x180), same as before. On
+// mobile, col-span-2 (full width of the 2-col mobile grid, ~358px) —
+// at the old col-span-1 mobile width (~173px) the event title's
+// `truncate` was visibly cutting titles off mid-word; there wasn't
+// room for one line of an 11px bold title plus badge/venue/price rows
+// in that narrow a box. Widening (not heightening) fixes that without
+// approaching the "big" hero-tile size (col-span-2 row-span-2) — this
+// stays row-span-1 on both breakpoints, so it's a wide short card, not
+// a tall one, and noticeably smaller in area than the hero tile.
+// Title changed from `truncate` (forces one line, hides overflow) to
+// `line-clamp-2` as extra headroom for long titles even at the wider
+// mobile width. The outer frame reuses the exact hero/header background
+// (W_TEXTURE zigzag + dark gradient — same literal values as
+// Header.tsx/app/page.tsx) rather than a flat purple, with generous
+// padding (p-3) so that frame reads as a thick border, not a thin
+// sliver. A white box sits centered in the middle of that frame holding
+// all the actual content (badge, title, venue, price rows).
 const W_TEXTURE = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='44'%3E%3Cpath d='M0 0 L20 34 L40 14 L60 34 L80 0' stroke='%239966CB' stroke-width='1.5' fill='none' opacity='0.15'/%3E%3C/svg%3E")`
 
 function TicketCTATile({ event }: { event: Event }) {
@@ -124,7 +132,7 @@ function TicketCTATile({ event }: { event: Event }) {
 
   return (
     <div
-      className="col-span-1 row-span-1 rounded-xl p-3 flex flex-col justify-center"
+      className="col-span-2 row-span-1 md:col-span-1 rounded-xl p-3 flex flex-col justify-center"
       style={{ background: `${W_TEXTURE}, linear-gradient(135deg, #060011 0%, #1a0638 45%, #2a0a50 55%, #060011 100%)` }}
     >
       <div className="bg-white rounded-lg px-2 py-1.5 flex flex-col justify-center">
@@ -135,7 +143,7 @@ function TicketCTATile({ event }: { event: Event }) {
           {event.sport} Tickets
         </span>
 
-        <h3 className="text-[11px] font-bold text-gray-900 leading-tight truncate">{event.title}</h3>
+        <h3 className="text-[11px] font-bold text-gray-900 leading-tight line-clamp-2">{event.title}</h3>
         <p className="text-[9px] text-gray-500 truncate">{event.venue} · {event.city}, {event.state}</p>
 
         <div className="mt-1 flex flex-col gap-0.5">
@@ -321,43 +329,43 @@ export default function NewsMosaic({ events }: { events: Event[] }) {
         Your women&apos;s sports feed for content, news, tickets, merch, and more.
       </h1>
 
-      {/* Search + sort + sport filter pills — centered as one group under
-          the hero, same search-by-team/city pattern as the ticket
-          listing page's EventsClient, persisted to localStorage so the
-          feed stays "personalized" across visits (see loadFeedPrefs). */}
+      {/* Search on its own row; sort + sport filter pills grouped together
+          on the row below (explicitly requested — sort was previously
+          stacked with search, separated from the pills, on mobile).
+          Same search-by-team/city pattern as the ticket listing page's
+          EventsClient; persisted to localStorage so the feed stays
+          "personalized" across visits (see loadFeedPrefs). */}
       <div className="flex flex-col items-center gap-3 mb-6">
-        <div className="flex flex-col sm:flex-row items-center gap-3">
-          <div className="relative w-72 max-w-full">
-            <svg
-              className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={2}
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
-            </svg>
-            <input
-              type="text"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search teams or cities…"
-              className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-gray-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#9966CB] focus:border-transparent transition"
-            />
-          </div>
+        <div className="relative w-72 max-w-full">
+          <svg
+            className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={2}
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+          </svg>
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search teams or cities…"
+            className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-gray-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#9966CB] focus:border-transparent transition"
+          />
+        </div>
 
+        <div className="flex items-center justify-center gap-2 flex-wrap">
           <select
             value={sort}
             onChange={(e) => setSort(e.target.value as SortOption)}
-            className="sm:w-52 px-3 py-2.5 rounded-xl border border-gray-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#9966CB] cursor-pointer"
+            className="px-3 py-1.5 rounded-full border border-gray-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#9966CB] cursor-pointer"
           >
             {SORT_OPTIONS.map((o) => (
               <option key={o}>{o}</option>
             ))}
           </select>
-        </div>
 
-        <div className="flex items-center justify-center gap-2 flex-wrap">
           {(['All', ...SPORTS] as const).map((sport) => (
             <button
               key={sport}
