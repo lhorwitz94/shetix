@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
-import Link from 'next/link'
 import type { NewsItem } from '@/lib/news'
 import type { Event, Sport } from '@/lib/types'
 import { SPORTS } from '@/lib/data'
@@ -243,7 +242,7 @@ function NewsTile({ item, big, onOpen }: { item: NewsItem; big: boolean; onOpen:
         <span className="text-[10px] uppercase tracking-wide bg-white/20 rounded px-1.5 py-0.5">
           {item.league}
         </span>
-        <h3 className={`mt-1 font-semibold leading-tight ${big ? 'text-lg' : 'text-sm'}`}>
+        <h3 className={`mt-1 font-semibold leading-tight line-clamp-4 md:line-clamp-none ${big ? 'text-lg' : 'text-sm'}`}>
           {item.title}
         </h3>
         <span className="text-[10px] text-white/60">{item.source}</span>
@@ -316,16 +315,11 @@ export default function NewsMosaic({ events }: { events: Event[] }) {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div className="mb-4">
-        <Link href="/" className="text-sm font-medium text-gray-400 hover:text-gray-700 flex items-center gap-1 transition-colors w-fit">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M19 12H5M12 19l-7-7 7-7"/>
-          </svg>
-          See all ticket listings
-        </Link>
-      </div>
+      {/* The "See all ticket listings" back-link used to live here — moved
+          up into the purple hero itself as a circular ticket icon
+          (Header.tsx), so it's not duplicated in both places. */}
 
-      <h1 className="text-center text-gray-500 text-base sm:text-lg max-w-xl mx-auto mb-6">
+      <h1 className="text-center text-gray-900 font-bold text-base sm:text-lg max-w-xl mx-auto mb-6">
         Your women&apos;s sports feed for content, news, tickets, merch, and more.
       </h1>
 

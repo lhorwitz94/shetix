@@ -31,17 +31,54 @@ export default function Header() {
   if (isNewsPage) {
     return (
       <header
-        className="sticky top-0 z-50 flex items-center justify-center"
+        className="sticky top-0 z-50"
         style={{
           background: `${W_TEXTURE}, linear-gradient(135deg, #060011 0%, #1a0638 45%, #2a0a50 55%, #060011 100%)`,
           height: '80px',
         }}
       >
-        <button
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full">
+          {/* Ticket icon — replaces the old "See all ticket listings"
+              text link, moved up into the hero per explicit direction.
+              Absolutely positioned (not flex) so it can sit at the left
+              edge of this same responsively-padded container while the
+              badge logo stays independently centered — a flex layout
+              with justify-between would've pushed the logo off-center
+              once this icon was added. Sized ~46px, proportionate to but
+              smaller than the ~60px-tall logo, same size on mobile and
+              desktop (the 80px header height doesn't change either). */}
+          <Link
+            href="/"
+            aria-label="See all ticket listings"
+            title="See all ticket listings"
+            style={{
+              position: 'absolute', left: 0, top: '50%', transform: 'translateY(-50%)',
+              width: 46, height: 46, borderRadius: '50%',
+              background: 'rgba(255,255,255,0.07)',
+              border: '1px solid rgba(153,102,203,0.55)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              transition: 'border-color 0.15s, background 0.15s',
+            }}
+            onMouseEnter={e => {
+              e.currentTarget.style.background = 'rgba(153,102,203,0.18)'
+              e.currentTarget.style.borderColor = 'rgba(153,102,203,0.9)'
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.background = 'rgba(255,255,255,0.07)'
+              e.currentTarget.style.borderColor = 'rgba(153,102,203,0.55)'
+            }}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2z" />
+            </svg>
+          </Link>
+
+          <button
           onClick={scrollToTop}
           aria-label="Back to top"
           style={{
-            position: 'relative', background: 'none', border: 'none', padding: 0,
+            position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%, -50%)',
+            background: 'none', border: 'none', padding: 0,
             cursor: 'pointer', width: 150, height: 60,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
           }}
@@ -88,7 +125,8 @@ export default function Header() {
               Wyn
             </span>
           </div>
-        </button>
+          </button>
+        </div>
       </header>
     )
   }
