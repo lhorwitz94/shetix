@@ -32,6 +32,31 @@ type Tile = { kind: 'news'; item: NewsItem; big: boolean } | { kind: 'cta'; even
 
 const CTA_EVERY = 7
 
+// Personalized-feed preferences: the same search + sport filter someone
+// leaves the page with is what they see next visit, matching the "save
+// this to personalize your feed" request rather than resetting every load.
+const PREFS_KEY = 'wyn-feed-prefs'
+
+interface FeedPrefs {
+  search: string
+  sport: Sport | 'All'
+}
+
+function loadFeedPrefs(): FeedPrefs {
+  if (typeof window === 'undefined') return { search: '', sport: 'All' }
+  try {
+    const raw = window.localStorage.getItem(PREFS_KEY)
+    if (!raw) return { search: '', sport: 'All' }
+    const parsed = JSON.parse(raw)
+    return {
+      search: typeof parsed.search === 'string' ? parsed.search : '',
+      sport: parsed.sport === 'All' || SPORTS.includes(parsed.sport) ? parsed.sport : 'All',
+    }
+  } catch {
+    return { search: '', sport: 'All' }
+  }
+}
+
 const SORT_OPTIONS = ['Most Recent', 'Alphabetical', 'By League'] as const
 type SortOption = (typeof SORT_OPTIONS)[number]
 
@@ -218,8 +243,10 @@ export default function NewsMosaic({ events }: { events: Event[] }) {
   const [items, setItems] = useState<NewsItem[]>([])
   const [loaded, setLoaded] = useState(false)
   const [activeSport, setActiveSport] = useState<Sport | 'All'>('All')
+  const [search, setSearch] = useState('')
   const [sort, setSort] = useState<SortOption>('Most Recent')
   const [previewItem, setPreviewItem] = useState<NewsItem | null>(null)
+  const [prefsLoaded, setPrefsLoaded] = useState(false)
 
   useEffect(() => {
     fetch('/api/news')
@@ -229,10 +256,41 @@ export default function NewsMosaic({ events }: { events: Event[] }) {
       .finally(() => setLoaded(true))
   }, [])
 
-  const filteredItems = useMemo(
-    () => (activeSport === 'All' ? items : items.filter((i) => i.league === activeSport)),
-    [items, activeSport],
-  )
+  // Deliberately NOT a useState lazy initializer here: reading
+  // localStorage in the initializer produced a reproduced-in-production
+  // hydration bug — the SSR pass always sees no window and renders
+  // 'All'/'' active, and React's production hydration doesn't reliably
+  // repaint already-hydrated DOM attributes (like which sport pill has
+  // the active className) to match the client's differing initial
+  // value, even though the internal state itself was correct. Loading
+  // in an effect after mount avoids that entirely, at the cost of one
+  // extra render right after mount (imperceptible in practice).
+  useEffect(() => {
+    const prefs = loadFeedPrefs()
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setSearch(prefs.search)
+    setActiveSport(prefs.sport)
+    setPrefsLoaded(true)
+  }, [])
+
+  useEffect(() => {
+    if (!prefsLoaded) return
+    window.localStorage.setItem(PREFS_KEY, JSON.stringify({ search, sport: activeSport }))
+  }, [search, activeSport, prefsLoaded])
+
+  const filteredItems = useMemo(() => {
+    let out = activeSport === 'All' ? items : items.filter((i) => i.league === activeSport)
+    if (search.trim()) {
+      const q = search.trim().toLowerCase()
+      out = out.filter(
+        (i) =>
+          i.title.toLowerCase().includes(q) ||
+          i.source.toLowerCase().includes(q) ||
+          i.excerpt.toLowerCase().includes(q),
+      )
+    }
+    return out
+  }, [items, activeSport, search])
   const sortedItems = useMemo(() => sortItems(filteredItems, sort), [filteredItems, sort])
   const filteredEvents = useMemo(
     () => (activeSport === 'All' ? events : events.filter((e) => e.sport === activeSport)),
@@ -258,17 +316,41 @@ export default function NewsMosaic({ events }: { events: Event[] }) {
         Your women&apos;s sports feed for content, news, tickets, merch, and more.
       </h1>
 
-      {/* Sort + sport filter pills — centered as one group under the hero */}
-      <div className="flex flex-col items-center sm:flex-row sm:justify-center gap-3 mb-6">
-        <select
-          value={sort}
-          onChange={(e) => setSort(e.target.value as SortOption)}
-          className="sm:w-52 px-3 py-2.5 rounded-xl border border-gray-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#9966CB] cursor-pointer"
-        >
-          {SORT_OPTIONS.map((o) => (
-            <option key={o}>{o}</option>
-          ))}
-        </select>
+      {/* Search + sort + sport filter pills — centered as one group under
+          the hero, same search-by-team/city pattern as the ticket
+          listing page's EventsClient, persisted to localStorage so the
+          feed stays "personalized" across visits (see loadFeedPrefs). */}
+      <div className="flex flex-col items-center gap-3 mb-6">
+        <div className="flex flex-col sm:flex-row items-center gap-3">
+          <div className="relative w-72 max-w-full">
+            <svg
+              className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+            </svg>
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search teams or cities…"
+              className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-gray-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#9966CB] focus:border-transparent transition"
+            />
+          </div>
+
+          <select
+            value={sort}
+            onChange={(e) => setSort(e.target.value as SortOption)}
+            className="sm:w-52 px-3 py-2.5 rounded-xl border border-gray-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#9966CB] cursor-pointer"
+          >
+            {SORT_OPTIONS.map((o) => (
+              <option key={o}>{o}</option>
+            ))}
+          </select>
+        </div>
 
         <div className="flex items-center justify-center gap-2 flex-wrap">
           {(['All', ...SPORTS] as const).map((sport) => (
@@ -291,7 +373,10 @@ export default function NewsMosaic({ events }: { events: Event[] }) {
         <p className="text-sm text-gray-400 py-12 text-center">No news available right now — check back soon.</p>
       )}
       {loaded && items.length > 0 && filteredItems.length === 0 && (
-        <p className="text-sm text-gray-400 py-12 text-center">No {activeSport} news right now — try a different sport.</p>
+        <p className="text-sm text-gray-400 py-12 text-center">
+          No {activeSport !== 'All' ? `${activeSport} ` : ''}results{search.trim() ? ` for "${search.trim()}"` : ''}
+          {' '}— try a different {search.trim() ? 'search term' : 'sport'}.
+        </p>
       )}
 
       <div className="grid grid-flow-dense grid-cols-2 md:grid-cols-4 auto-rows-[180px] gap-3">
