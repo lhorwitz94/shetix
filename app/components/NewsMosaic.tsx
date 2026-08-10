@@ -180,15 +180,20 @@ function NewsTile({ item, big, onOpen }: { item: NewsItem; big: boolean; onOpen:
   // column width as a regular tile (not wider) so it packs into the
   // masonry cleanly rather than disrupting the column rhythm.
   //
-  // row-span is responsive: mobile's grid is only 2 columns
-  // (grid-cols-2 md:grid-cols-4 below), so each column is much narrower
-  // there (~173px) than on desktop (~295px) — row-span-3 at that width
-  // came out far too stretched/thin (~0.31:1) versus a proper portrait
-  // ratio. row-span-2 on mobile keeps it closer to a real 9:16 shape;
-  // row-span-3 still applies from md: up, where the wider column makes
-  // that height actually look like a TikTok/Reels ratio (~0.52:1).
+  // row-span-2 uniformly (not row-span-3 on desktop) — a deliberately
+  // more condensed size per explicit "shrink it a little" feedback.
+  // Desktop used to bump to row-span-3 (564px tall at ~295px columns,
+  // closer to a true 9:16 ratio) but that read as too dominant in the
+  // mosaic; row-span-2 (372px) still reads clearly as a portrait/vertical
+  // shape (unlike the square small-article tiles or wide big-article
+  // tiles) without taking up as much vertical real estate. Mobile's grid
+  // is only 2 columns (grid-cols-2 md:grid-cols-4 below, much narrower
+  // columns, ~173px) — row-span-2 there was already the compact end of
+  // what still reads as portrait; row-span-1 would make it square, same
+  // shape as a small article tile, losing the "this is a video" visual
+  // distinction entirely, so it stays at row-span-2 for both.
   const sizeClass = isVideo
-    ? 'col-span-1 row-span-2 md:row-span-3'
+    ? 'col-span-1 row-span-2'
     : big ? 'col-span-2 row-span-2' : 'col-span-1 row-span-1'
 
   return (
