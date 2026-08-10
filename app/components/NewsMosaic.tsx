@@ -177,7 +177,13 @@ function NewsTile({ item, big, onOpen }: { item: NewsItem; big: boolean; onOpen:
         <img
           src={item.image}
           alt=""
-          className="absolute inset-0 h-full w-full object-cover opacity-70 group-hover:opacity-90 transition-opacity"
+          // object-position biased toward the top (not 50% 50%) — most
+          // article thumbnails are sports action photography with
+          // subjects' heads near the top of the frame, and a dead-center
+          // crop was cutting heads off whenever the source photo needed
+          // to be cropped vertically to fit the tile. Confirmed by
+          // screenshotting real article tiles before/after, not assumed.
+          className="absolute inset-0 h-full w-full object-cover object-[center_25%] opacity-70 group-hover:opacity-90 transition-opacity"
           onError={(e) => {
             e.currentTarget.style.display = 'none'
           }}
