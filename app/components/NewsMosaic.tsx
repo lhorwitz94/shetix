@@ -5,6 +5,7 @@ import type { NewsItem } from '@/lib/news'
 import type { Event, Sport } from '@/lib/types'
 import { SPORTS } from '@/lib/data'
 import PreviewModal from './PreviewModal'
+import { mooligat } from '../fonts'
 
 // Same sport → badge color mapping as EventCard.tsx, duplicated locally
 // (kept small and self-contained rather than exporting it out of EventCard)
@@ -319,7 +320,16 @@ export default function NewsMosaic({ events }: { events: Event[] }) {
           up into the purple hero itself as a circular ticket icon
           (Header.tsx), so it's not duplicated in both places. */}
 
-      <h1 className="text-center text-gray-900 font-bold text-base sm:text-lg max-w-xl mx-auto mb-6">
+      {/* Fluid clamp() font-size, not fixed breakpoint steps — a fixed
+          13px still overflowed on narrow phones (~360px) since this is
+          one long fixed-length line forced to stay on one line
+          (whitespace-nowrap). clamp() scales continuously with viewport
+          width so it never overflows at any size, not just the specific
+          widths tested. */}
+      <h1
+        className={`${mooligat.className} text-center text-gray-900 font-bold whitespace-nowrap mb-6`}
+        style={{ fontSize: 'clamp(10px, 2.7vw, 18px)' }}
+      >
         Your women&apos;s sports feed for content, news, tickets, merch, and more.
       </h1>
 

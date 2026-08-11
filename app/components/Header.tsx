@@ -2,15 +2,10 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Luckiest_Guy } from 'next/font/google'
 import GetTicketAlertsButton from './GetTicketAlertsButton'
+import { mooligat } from '../fonts'
 
 const W_TEXTURE = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='44'%3E%3Cpath d='M0 0 L20 34 L40 14 L60 34 L80 0' stroke='%239966CB' stroke-width='1.5' fill='none' opacity='0.15'/%3E%3C/svg%3E")`
-
-// "The Wyn" badge logo — chunky comic/patch-style display font (distinct
-// from wtix's italic shimmer script) so the two wordmarks read as
-// different products sharing one site.
-const badgeFont = Luckiest_Guy({ subsets: ['latin'], weight: '400' })
 
 function scrollToTop() {
   window.scrollTo({ top: 0, behavior: 'smooth' })
@@ -102,7 +97,7 @@ export default function Header() {
           </svg>
 
           <div
-            className={badgeFont.className}
+            className={mooligat.className}
             style={{ position: 'relative', zIndex: 10, display: 'flex', flexDirection: 'column', alignItems: 'center', lineHeight: 1 }}
           >
             <span
