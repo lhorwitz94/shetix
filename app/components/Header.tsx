@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import GetTicketAlertsButton from './GetTicketAlertsButton'
-import { mooligat } from '../fonts'
+import { wynFont } from '../fonts'
 
 const W_TEXTURE = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='44'%3E%3Cpath d='M0 0 L20 34 L40 14 L60 34 L80 0' stroke='%239966CB' stroke-width='1.5' fill='none' opacity='0.15'/%3E%3C/svg%3E")`
 
@@ -97,7 +97,7 @@ export default function Header() {
           </svg>
 
           <div
-            className={mooligat.className}
+            className={wynFont.className}
             style={{ position: 'relative', zIndex: 10, display: 'flex', flexDirection: 'column', alignItems: 'center', lineHeight: 1 }}
           >
             <span
