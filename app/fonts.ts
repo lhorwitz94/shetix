@@ -1,13 +1,19 @@
-import localFont from 'next/font/local'
+import { Playfair_Display, DM_Sans } from 'next/font/google'
 
-// Used for both the Wyn badge logo wordmark and the tagline beneath the
-// hero on /news — shared here so both components load the same font
-// instance rather than declaring next/font/local twice. Named generically
-// (not after the specific font) since this has already been swapped once
-// and will likely be swapped again — only this file needs to change, not
-// every place that imports it.
-export const wynFont = localFont({
-  src: './fonts/melanin.otf',
-  weight: '400',
+// Headline font — the "The"/"Wyn" badge wordmark in Header.tsx. Replaces
+// the local wynFont (melanin.otf) previously shared between the badge and
+// the /news tagline; the badge and tagline now intentionally use two
+// different typefaces, so each gets its own export.
+export const headlineFont = Playfair_Display({
+  subsets: ['latin'],
+  weight: ['700', '900'],
+  display: 'swap',
+})
+
+// Supporting/tagline font — the "Your women's sports feed…" text under
+// the hero on /news (NewsMosaic.tsx).
+export const supportingFont = DM_Sans({
+  subsets: ['latin'],
+  weight: ['400', '500'],
   display: 'swap',
 })

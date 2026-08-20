@@ -5,7 +5,7 @@ import type { NewsItem } from '@/lib/news'
 import type { Event, Sport } from '@/lib/types'
 import { SPORTS } from '@/lib/data'
 import PreviewModal from './PreviewModal'
-import { wynFont } from '../fonts'
+import { supportingFont } from '../fonts'
 
 // Same sport → badge color mapping as EventCard.tsx, duplicated locally
 // (kept small and self-contained rather than exporting it out of EventCard)
@@ -327,7 +327,7 @@ export default function NewsMosaic({ events }: { events: Event[] }) {
           width so it never overflows at any size, not just the specific
           widths tested. */}
       <h1
-        className={`${wynFont.className} text-center text-gray-900 font-bold whitespace-nowrap mb-6`}
+        className={`${supportingFont.className} text-center text-gray-900 font-bold whitespace-nowrap mb-6`}
         style={{ fontSize: 'clamp(10px, 2.7vw, 18px)' }}
       >
         Your women&apos;s sports feed for content, news, tickets, merch, and more.
