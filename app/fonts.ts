@@ -1,17 +1,10 @@
-import { Playfair_Display, DM_Sans } from 'next/font/google'
-
-// Headline font — the "The"/"Wyn" badge wordmark in Header.tsx. Replaces
-// the local wynFont (melanin.otf) previously shared between the badge and
-// the /news tagline; the badge and tagline now intentionally use two
-// different typefaces, so each gets its own export.
-export const headlineFont = Playfair_Display({
-  subsets: ['latin'],
-  weight: ['700', '900'],
-  display: 'swap',
-})
+import { DM_Sans } from 'next/font/google'
 
 // Supporting/tagline font — the "Your women's sports feed…" text under
-// the hero on /news (NewsMosaic.tsx).
+// the hero on /news (NewsMosaic.tsx). The badge wordmark this used to be
+// shared with (see git history — local wynFont, then Playfair Display) is
+// now the official WynFeed logo image (public/wynlogo), so there's no
+// second "headline" font to export here anymore.
 export const supportingFont = DM_Sans({
   subsets: ['latin'],
   weight: ['400', '500'],

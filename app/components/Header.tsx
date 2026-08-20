@@ -1,10 +1,9 @@
 'use client'
 
+import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useLayoutEffect, useRef, useState } from 'react'
 import GetTicketAlertsButton from './GetTicketAlertsButton'
-import { headlineFont } from '../fonts'
 
 const W_TEXTURE = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='44'%3E%3Cpath d='M0 0 L20 34 L40 14 L60 34 L80 0' stroke='%239966CB' stroke-width='1.5' fill='none' opacity='0.15'/%3E%3C/svg%3E")`
 
@@ -15,27 +14,6 @@ function scrollToTop() {
 export default function Header() {
   const pathname = usePathname()
   const isNewsPage = pathname?.startsWith('/news')
-
-  // The gold ellipse used to be a fixed 150x60/rx68,ry24 box tuned by eye
-  // for the old local font — it didn't track the wordmark's actual
-  // rendered size, so any font swap (like this one, to Playfair Display)
-  // risked the text no longer fitting the badge, or the badge looking
-  // oversized around a narrower typeface. Measuring the real "The"/"Wyn"
-  // text box after mount and deriving the ellipse from it keeps the badge
-  // proportional to whatever font is current. Clamped to stay within the
-  // 80px header (see the sizing-history note this file used to have about
-  // an earlier badge clipping the viewport).
-  const wordmarkRef = useRef<HTMLDivElement>(null)
-  const [badge, setBadge] = useState({ rx: 68, ry: 24, boxW: 150, boxH: 60 })
-
-  useLayoutEffect(() => {
-    const el = wordmarkRef.current
-    if (!el) return
-    const { width, height } = el.getBoundingClientRect()
-    const rx = Math.min(85, Math.max(45, width * 0.72))
-    const ry = Math.min(28, Math.max(18, height * 0.62))
-    setBadge({ rx, ry, boxW: rx * 2 + 20, boxH: ry * 2 + 16 })
-  }, [])
 
   // /news gets its own hero treatment: "The Wyn" centered, no News/Get
   // Ticket Alerts buttons — this header *is* the page's hero here, not
@@ -91,57 +69,32 @@ export default function Header() {
           </Link>
 
           <button
-          onClick={scrollToTop}
-          aria-label="Back to top"
-          style={{
-            position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%, -50%)',
-            background: 'none', border: 'none', padding: 0,
-            cursor: 'pointer', width: badge.boxW, height: badge.boxH,
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-          }}
-        >
-          {/* Badge backdrop — gold ellipse, tilted, thin clean black
-              outline (a thick stroke here read as "crayon-drawn" —
-              corrected per explicit feedback). rx/ry are derived from the
-              measured wordmark size below (see badge state above) so the
-              ellipse stays proportional to the text rather than a size
-              tuned for one specific font. */}
-          <svg
-            width={badge.boxW} height={badge.boxH} viewBox={`0 0 ${badge.boxW} ${badge.boxH}`}
-            style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}
+            onClick={scrollToTop}
+            aria-label="Back to top"
+            style={{
+              position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%, -50%)',
+              background: 'none', border: 'none', padding: 0,
+              cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}
           >
-            <ellipse
-              cx={badge.boxW / 2} cy={badge.boxH / 2} rx={badge.rx} ry={badge.ry}
-              fill="#E8A93D" stroke="#000" strokeWidth="2"
-              transform={`rotate(-17 ${badge.boxW / 2} ${badge.boxH / 2})`}
+            {/* Official WynFeed logo (public/wynlogo) — replaces the old
+                hand-built gold-ellipse + wynFont wordmark. Source PNG is
+                cropped tight to its opaque content (see wyn-feed-logo.png,
+                stripped of the transparent margin the original export had)
+                so a fixed `height` here maps directly to the visible badge
+                size instead of mostly-empty padding. `width: 'auto'` (the
+                Next.js pattern for intrinsic-ratio scaling) keeps the
+                ellipse's proportions correct — same height on mobile and
+                desktop since the 80px header height doesn't change either,
+                matching the old badge's sizing behavior. */}
+            <Image
+              src="/wynlogo/wyn-feed-logo.png"
+              alt="The Wyn"
+              width={445}
+              height={231}
+              priority
+              style={{ height: 56, width: 'auto' }}
             />
-          </svg>
-
-          <div
-            ref={wordmarkRef}
-            className={headlineFont.className}
-            style={{ position: 'relative', zIndex: 10, display: 'flex', flexDirection: 'column', alignItems: 'center', lineHeight: 1 }}
-          >
-            <span
-              style={{
-                fontSize: '0.7rem', color: '#B8A6F0', fontWeight: 700,
-                WebkitTextStroke: '0.6px #000',
-                transform: 'rotate(-10deg)',
-                marginBottom: '-3px',
-              }}
-            >
-              The
-            </span>
-            <span
-              style={{
-                fontSize: '1.5rem', color: '#B8A6F0', fontWeight: 900,
-                WebkitTextStroke: '1.1px #000',
-                textShadow: '1px 1px 0 rgba(0,0,0,0.85)',
-              }}
-            >
-              Wyn
-            </span>
-          </div>
           </button>
         </div>
       </header>
