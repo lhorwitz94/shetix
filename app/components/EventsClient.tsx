@@ -4,7 +4,7 @@ import { useState, useMemo } from 'react'
 import Link from 'next/link'
 import type { Event, Sport } from '@/lib/types'
 import { SPORTS } from '@/lib/data'
-import { isWithin72Hours } from '@/lib/utils'
+import { isWithin72Hours, parseEventStart } from '@/lib/utils'
 import EventCard from './EventCard'
 
 const SORT_OPTIONS = ['Date', 'Price: Low to High', 'Price: High to Low'] as const
@@ -41,7 +41,12 @@ export default function EventsClient({ events }: { events: Event[] }) {
     }
 
     if (sort === 'Date') {
-      out = [...out].sort((a, b) => a.date.localeCompare(b.date))
+      // Full start datetime, not just the date string — see lib/merge.ts's
+      // final sort for why (same-day events need their actual start time
+      // to sort correctly, not just the query order they arrived in).
+      out = [...out].sort(
+        (a, b) => parseEventStart(a.date, a.time).getTime() - parseEventStart(b.date, b.time).getTime(),
+      )
     } else if (sort === 'Price: Low to High') {
       out = [...out].sort((a, b) => minPrice(a) - minPrice(b))
     } else {

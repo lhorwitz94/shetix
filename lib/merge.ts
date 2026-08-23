@@ -1,4 +1,5 @@
 import type { Event } from './types'
+import { parseEventStart } from './utils'
 
 // Tokenize a title into meaningful words for fuzzy matching
 function tokens(title: string): Set<string> {
@@ -53,5 +54,15 @@ export function mergeEventSources(primary: Event[], secondary: Event[]): Event[]
     }
   }
 
-  return result.sort((a, b) => a.date.localeCompare(b.date))
+  // Full start datetime, not just the date — a date-only compare left
+  // same-day events in whatever order they arrived from the per-sport
+  // Ticketmaster/SeatGeek queries (i.e. grouped by sport), not by actual
+  // start time, so a 7pm game could sort ahead of a 4pm one on the same
+  // day. parseEventStart falls back to midnight for events with no known
+  // time ('TBD', e.g. Golf without a Ticketmaster localTime), which sorts
+  // them first within their day — a reasonable default, same fallback
+  // isWithin72Hours already relies on elsewhere.
+  return result.sort(
+    (a, b) => parseEventStart(a.date, a.time).getTime() - parseEventStart(b.date, b.time).getTime(),
+  )
 }
