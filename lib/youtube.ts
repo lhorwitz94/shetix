@@ -1,10 +1,16 @@
 import type { NewsItem } from './news'
 import type { Sport } from './types'
 
+// "official" — a league's own channel. "outlet" — a media/press
+// organization covering women's sports. "creator" — an individual
+// personality/creator, not a league or outlet.
+type SourceType = 'official' | 'outlet' | 'creator'
+
 interface TrustedChannel {
   label: string
   channelId: string
   league: Sport | "Women's Sports"
+  sourceType: SourceType
 }
 
 // Verified 2026-07-30 by fetching each channel's public feed directly and
@@ -13,11 +19,17 @@ interface TrustedChannel {
 // particular gives no indication from its name alone: it's Christen Press &
 // Tobin Heath's show, entirely NWSL/USWNT/Women's World Cup content.
 const TRUSTED_CHANNELS: TrustedChannel[] = [
-  { label: 'NWSL', channelId: 'UCL4xu08EDu0ZFZsBJUB0chw', league: 'NWSL' },
-  { label: 'WNBA', channelId: 'UCO9a_ryN_l7DIDS-VIt-zmw', league: 'WNBA' },
-  { label: 'PWHL', channelId: 'UCNKUkQV2R0JKakyE1vuC1lQ', league: 'PWHL' },
-  { label: "Just Women's Sports", channelId: 'UCv5306tE1yjLn1D31PL7kFA', league: "Women's Sports" },
-  { label: 'RE', channelId: 'UCjseWKLbnjmy4PuLBsi2YYA', league: "Women's Sports" },
+  { label: 'NWSL', channelId: 'UCL4xu08EDu0ZFZsBJUB0chw', league: 'NWSL', sourceType: 'official' },
+  { label: 'WNBA', channelId: 'UCO9a_ryN_l7DIDS-VIt-zmw', league: 'WNBA', sourceType: 'official' },
+  { label: 'PWHL', channelId: 'UCNKUkQV2R0JKakyE1vuC1lQ', league: 'PWHL', sourceType: 'official' },
+  { label: "Just Women's Sports", channelId: 'UCv5306tE1yjLn1D31PL7kFA', league: "Women's Sports", sourceType: 'outlet' },
+  { label: 'RE', channelId: 'UCjseWKLbnjmy4PuLBsi2YYA', league: "Women's Sports", sourceType: 'outlet' },
+  // Basketball-focused creator (WNBA + college hoops content, interviews,
+  // commentary) — not a league or outlet channel, so tagged 'creator'.
+  // League bucketed under the "Women's Sports" catch-all rather than a
+  // single Sport, same as JWS/RE above, since her content isn't scoped to
+  // one league's games the way the official channels are.
+  { label: 'Rachel DeMita', channelId: 'UCBS2RdExOLDYVLnfsZ2Q4-w', league: "Women's Sports", sourceType: 'creator' },
 ]
 
 function matchOne(str: string, regex: RegExp): string | null {
