@@ -124,6 +124,13 @@ function buildTiles(items: NewsItem[], events: Event[]): Tile[] {
 // all the actual content (badge, title, venue, price rows).
 const W_TEXTURE = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='44'%3E%3Cpath d='M0 0 L20 34 L40 14 L60 34 L80 0' stroke='%239966CB' stroke-width='1.5' fill='none' opacity='0.15'/%3E%3C/svg%3E")`
 
+// Same weekday/month/day format as EventCard.tsx's formatDate, duplicated
+// locally for the same reason as SPORT_STYLES/MARKET_TEXT above.
+function formatEventDate(dateStr: string) {
+  const d = new Date(dateStr + 'T00:00:00')
+  return d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })
+}
+
 function TicketCTATile({ event }: { event: Event }) {
   const priceValues = event.markets.map((m) => m.minPrice).filter((p) => p > 0)
   const lowestPrice = priceValues.length > 0 ? Math.min(...priceValues) : null
@@ -135,7 +142,18 @@ function TicketCTATile({ event }: { event: Event }) {
       className="col-span-2 row-span-1 md:col-span-1 rounded-xl p-3 flex flex-col justify-center"
       style={{ background: `${W_TEXTURE}, linear-gradient(135deg, #060011 0%, #1a0638 45%, #2a0a50 55%, #060011 100%)` }}
     >
-      <div className="bg-white rounded-lg px-2 py-1.5 flex flex-col justify-center">
+      <div className="bg-white rounded-lg px-2 py-2 flex flex-col justify-center">
+        {/* Date/time — re-added in the top-left corner of the white box,
+            above the sport badge. Same 🗓️ marker + stacked date/time
+            EventCard.tsx uses, shrunk to this tile's already-tiny type
+            scale (text-[7px]) so it fits the fixed 180px row without
+            pushing the price rows below it out of the frame. */}
+        <p className="text-[7px] font-bold leading-tight mb-1">
+          <span className="text-gray-600">🗓️ {formatEventDate(event.date)}</span>
+          <br />
+          <span className="text-gray-400">{event.time} ET</span>
+        </p>
+
         <span className={`inline-flex items-center gap-0.5 w-fit text-[8px] font-bold px-1.5 py-0.5 rounded-full leading-none mb-1 ${badgeStyle}`}>
           <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
             <path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2z" />
