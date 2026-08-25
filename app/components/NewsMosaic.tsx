@@ -143,23 +143,24 @@ function TicketCTATile({ event }: { event: Event }) {
       style={{ background: `${W_TEXTURE}, linear-gradient(135deg, #060011 0%, #1a0638 45%, #2a0a50 55%, #060011 100%)` }}
     >
       <div className="bg-white rounded-lg px-2 py-2 flex flex-col justify-center">
-        {/* Date/time — re-added in the top-left corner of the white box,
-            above the sport badge. Same 🗓️ marker + stacked date/time
-            EventCard.tsx uses, shrunk to this tile's already-tiny type
-            scale (text-[7px]) so it fits the fixed 180px row without
-            pushing the price rows below it out of the frame. */}
-        <p className="text-[7px] font-bold leading-tight mb-1">
-          <span className="text-gray-600">🗓️ {formatEventDate(event.date)}</span>
-          <br />
-          <span className="text-gray-400">{event.time} ET</span>
-        </p>
+        {/* Sport badge (left) + date/time (right) — same left/right split
+            as EventCard.tsx's header row, just at this tile's tiny type
+            scale (text-[7px] for the date) so it fits the fixed 180px row
+            without pushing the price rows below it out of the frame. */}
+        <div className="flex items-start justify-between gap-1 mb-1">
+          <span className={`inline-flex items-center gap-0.5 w-fit text-[8px] font-bold px-1.5 py-0.5 rounded-full leading-none ${badgeStyle}`}>
+            <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2z" />
+            </svg>
+            {event.sport} Tickets
+          </span>
 
-        <span className={`inline-flex items-center gap-0.5 w-fit text-[8px] font-bold px-1.5 py-0.5 rounded-full leading-none mb-1 ${badgeStyle}`}>
-          <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2z" />
-          </svg>
-          {event.sport} Tickets
-        </span>
+          <p className="text-[7px] font-bold leading-tight text-right shrink-0">
+            <span className="text-gray-600">🗓️ {formatEventDate(event.date)}</span>
+            <br />
+            <span className="text-gray-400">{event.time} ET</span>
+          </p>
+        </div>
 
         <h3 className="text-[11px] font-bold text-gray-900 leading-tight line-clamp-2">{event.title}</h3>
         <p className="text-[9px] text-gray-500 truncate">{event.venue} · {event.city}, {event.state}</p>
