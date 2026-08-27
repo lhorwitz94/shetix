@@ -80,13 +80,20 @@ function parseYouTubeAtomFeed(xml: string, source: TrustedChannel): NewsItem[] {
     .filter((item): item is NewsItem => item !== null)
 }
 
+// YouTube's public feed endpoint intermittently 404s on an otherwise-valid
+// channel_id (confirmed by re-running the identical request seconds apart
+// against the NWSL channel — first 404, then 200) — one retry covers that
+// transient case instead of silently zeroing out a channel for a whole
+// fetch cycle.
 async function fetchChannelVideos(source: TrustedChannel): Promise<NewsItem[]> {
   const url = `https://www.youtube.com/feeds/videos.xml?channel_id=${source.channelId}`
-  const res = await fetch(url, { cache: 'no-store' })
-  if (!res.ok) return []
 
-  const xml = await res.text()
-  return parseYouTubeAtomFeed(xml, source)
+  for (let attempt = 0; attempt < 2; attempt++) {
+    const res = await fetch(url, { cache: 'no-store' })
+    if (res.ok) return parseYouTubeAtomFeed(await res.text(), source)
+  }
+
+  return []
 }
 
 export async function getAllTrustedVideos(): Promise<NewsItem[]> {
