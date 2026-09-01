@@ -37,9 +37,15 @@ const CTA_EVERY = 7
 // this to personalize your feed" request rather than resetting every load.
 const PREFS_KEY = 'wyn-feed-prefs'
 
+// 'Unrivaled' is a news/video-only league (no ticket-marketplace presence),
+// so it's appended here for the feed's own filter pills rather than added
+// to lib/data.ts's SPORTS, which also drives the ticket marketplace's pills.
+const NEWS_LEAGUES = [...SPORTS, 'Unrivaled'] as const
+type NewsLeagueFilter = Sport | 'Unrivaled'
+
 interface FeedPrefs {
   search: string
-  sport: Sport | 'All'
+  sport: NewsLeagueFilter | 'All'
 }
 
 function loadFeedPrefs(): FeedPrefs {
@@ -50,7 +56,7 @@ function loadFeedPrefs(): FeedPrefs {
     const parsed = JSON.parse(raw)
     return {
       search: typeof parsed.search === 'string' ? parsed.search : '',
-      sport: parsed.sport === 'All' || SPORTS.includes(parsed.sport) ? parsed.sport : 'All',
+      sport: parsed.sport === 'All' || NEWS_LEAGUES.includes(parsed.sport) ? parsed.sport : 'All',
     }
   } catch {
     return { search: '', sport: 'All' }
@@ -274,7 +280,7 @@ function NewsTile({ item, big, onOpen }: { item: NewsItem; big: boolean; onOpen:
 export default function NewsMosaic({ events }: { events: Event[] }) {
   const [items, setItems] = useState<NewsItem[]>([])
   const [loaded, setLoaded] = useState(false)
-  const [activeSport, setActiveSport] = useState<Sport | 'All'>('All')
+  const [activeSport, setActiveSport] = useState<NewsLeagueFilter | 'All'>('All')
   const [search, setSearch] = useState('')
   const [sort, setSort] = useState<SortOption>('Most Recent')
   const [previewItem, setPreviewItem] = useState<NewsItem | null>(null)
@@ -389,7 +395,7 @@ export default function NewsMosaic({ events }: { events: Event[] }) {
             ))}
           </select>
 
-          {(['All', ...SPORTS] as const).map((sport) => (
+          {(['All', ...NEWS_LEAGUES] as const).map((sport) => (
             <button
               key={sport}
               onClick={() => setActiveSport(sport)}
@@ -429,6 +435,14 @@ export default function NewsMosaic({ events }: { events: Event[] }) {
           ),
         )}
       </div>
+
+      <footer className="mt-10 pt-6 border-t border-gray-200 text-center text-xs text-gray-400 space-y-1 max-w-3xl mx-auto">
+        <p>Articles from Just Women&apos;s Sports, The Next, Swish Appeal, and The GIST.</p>
+        <p>
+          Video from the official NWSL, WNBA, PWHL, and Unrivaled YouTube channels, plus Just
+          Women&apos;s Sports, RE, and Rachel DeMita.
+        </p>
+      </footer>
 
       <PreviewModal item={previewItem} onClose={() => setPreviewItem(null)} />
     </div>

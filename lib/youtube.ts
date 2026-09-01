@@ -1,5 +1,4 @@
-import type { NewsItem } from './news'
-import type { Sport } from './types'
+import type { NewsItem, NewsLeague } from './news'
 
 // "official" — a league's own channel. "outlet" — a media/press
 // organization covering women's sports. "creator" — an individual
@@ -9,7 +8,7 @@ type SourceType = 'official' | 'outlet' | 'creator'
 interface TrustedChannel {
   label: string
   channelId: string
-  league: Sport | "Women's Sports"
+  league: NewsLeague
   sourceType: SourceType
 }
 
@@ -22,6 +21,9 @@ const TRUSTED_CHANNELS: TrustedChannel[] = [
   { label: 'NWSL', channelId: 'UCL4xu08EDu0ZFZsBJUB0chw', league: 'NWSL', sourceType: 'official' },
   { label: 'WNBA', channelId: 'UCO9a_ryN_l7DIDS-VIt-zmw', league: 'WNBA', sourceType: 'official' },
   { label: 'PWHL', channelId: 'UCNKUkQV2R0JKakyE1vuC1lQ', league: 'PWHL', sourceType: 'official' },
+  // Verified 2026-08-31 via @UnrivaledBasketball's channel page → externalId,
+  // then confirmed the feed itself returns real Unrivaled highlight videos.
+  { label: 'Unrivaled', channelId: 'UCkom4cFUC0MLscNIGoK9Iog', league: 'Unrivaled', sourceType: 'official' },
   { label: "Just Women's Sports", channelId: 'UCv5306tE1yjLn1D31PL7kFA', league: "Women's Sports", sourceType: 'outlet' },
   { label: 'RE', channelId: 'UCjseWKLbnjmy4PuLBsi2YYA', league: "Women's Sports", sourceType: 'outlet' },
   // Basketball-focused creator (WNBA + college hoops content, interviews,

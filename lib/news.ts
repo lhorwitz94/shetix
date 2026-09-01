@@ -1,12 +1,17 @@
 import Parser from 'rss-parser'
 import type { Sport } from './types'
 
+// 'Unrivaled' isn't a Sport (no ticket-marketplace presence — Ticketmaster/
+// SeatGeek aren't queried for it), it's a news/video-only league, so it's
+// added here rather than to lib/types.ts's Sport union.
+export type NewsLeague = Sport | "Women's Sports" | 'Unrivaled'
+
 export interface NewsItem {
   id: string
   title: string
   link: string
   source: string
-  league: Sport | "Women's Sports"
+  league: NewsLeague
   image: string | null
   excerpt: string
   publishedAt: string
@@ -62,19 +67,20 @@ const TRUSTED_WOMENS_ONLY_SOURCES = new Set<string>([
 
 // ── League tagging ───────────────────────────────────────────────────────────
 
-const LEAGUE_KEYWORDS: Record<Sport, string[]> = {
+const LEAGUE_KEYWORDS: Record<Sport | 'Unrivaled', string[]> = {
   WNBA: ['wnba', 'caitlin clark', "a'ja wilson", 'napheesa collier'],
   NWSL: ['nwsl', 'uswnt', 'gotham fc', 'angel city'],
   PWHL: ['pwhl', 'hilary knight'],
   Tennis: ['wta', "women's tennis"],
   Golf: ['lpga', "women's golf", "women's pga"],
   College: ["ncaa women", "women's college basketball", "women's college", 'college softball', "women's basketball tournament"],
+  Unrivaled: ['unrivaled'],
 }
 
 function tagLeague(text: string): NewsItem['league'] {
   const lower = text.toLowerCase()
   for (const [league, keywords] of Object.entries(LEAGUE_KEYWORDS)) {
-    if (keywords.some((k) => lower.includes(k))) return league as Sport
+    if (keywords.some((k) => lower.includes(k))) return league as Sport | 'Unrivaled'
   }
   return "Women's Sports"
 }
